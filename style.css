@@ -1,12 +1,71 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
 .line{
     width: 100%;
     height: 10px;
     background-color: #4C1E1E;
-    margin: 130px 0;
+    /* margin: 10px 0 0 0; */
 }
 
 body {
-    border: 12px solid #4C1E1E;
+    border-right: 15px solid #4C1E1E;
+    border-left: 15px solid #4C1E1E;
+    border-bottom: 25px solid #4C1E1E;
     box-sizing: border-box;
     background-color: #D1B187;
+    font-family: 'Lexend', sans-serif;
+    font-weight: 400;
+}
+
+#navBar {
+    border-bottom: 10px solid #4C1E1E;
+    border-top: 10px solid #4C1E1E;
+    box-sizing: border-box;
+    padding: 10px 10px 10px 10px;
+    background-color: #4C1E1E;
+}
+
+#headingText {
+    color: white;
+    font-size: 20px;
+    text-align: center;
+}
+
+.bookSpine {
+    border: 1px solid black;
+    display: flex;
+    color: white;
+    padding: 5px;
+    text-align: center;
+    width: 20px;
+    writing-mode: vertical-rl;
+    font-size: 12px;
+}
+
+.bookSpine1 {
+    background-color: #384C47;
+    height: 70px;
+    margin: 35px 0 0 5px;
+}
+
+.bookSpine2 {
+    background-color: #C77562;
+    height: 100px;
+    margin: 5px 0 0 0;
+}
+
+.bookSpine3 {
+    background-color: #006E90;
+    height: 50px;
+    margin: 55px 0 0 0;
+}
+
+.bookSpine4 {
+    background-color: #7E5A9B;
+    height: 85px;
+    margin: 20px 0 0 0;
+}
+
+.container {
+    display: flex;
 }
