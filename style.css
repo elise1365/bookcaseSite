@@ -45,7 +45,7 @@ body {
 .bookSpine1 {
     background-color: #384C47;
     height: 70px;
-    margin: 35px 0 0 5px;
+    margin: 35px 0 0 0;
 }
 
 .bookSpine2 {
@@ -67,5 +67,9 @@ body {
 }
 
 .container {
+    display: flex;
+}
+
+#bookShelf{
     display: flex;
 }
