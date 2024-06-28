@@ -1,15 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
-.line{
-    width: 100%;
-    height: 10px;
-    background-color: #4C1E1E;
-    /* margin: 10px 0 0 0; */
-}
-
 body {
-    border-right: 15px solid #4C1E1E;
-    border-left: 15px solid #4C1E1E;
+    border-right: 20px solid #4C1E1E;
+    border-left: 20px solid #4C1E1E;
     border-bottom: 25px solid #4C1E1E;
     box-sizing: border-box;
     background-color: #D1B187;
@@ -72,4 +65,5 @@ body {
 
 #bookShelf{
     display: flex;
+    flex-wrap: wrap;
 }

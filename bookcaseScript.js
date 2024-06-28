@@ -1,19 +1,7 @@
 "use strict"
 
-let numOfShelves = 1;
-
-function drawLines() {
-    let lineContainer = document.getElementById("lineContainer");
-    for(let i=0;i<numOfShelves-1;i++){
-        const line = document.createElement("div");
-        line.className = "line";
-        lineContainer.appendChild(line);
-    }
-}
-
-window.onload = drawLines;
-
 function drawBooks(listOfBooks) {
+
     let bookShelf = document.getElementById("bookShelf");
     for(let i=0;i<listOfBooks.length;i++){
         // assign a different spine style randomly
