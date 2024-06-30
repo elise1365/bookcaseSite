@@ -29,7 +29,7 @@ input:focus {
     outline: none;
 }
 
-button {
+#signUpBttn {
     margin: 10px 10px 0 0;
     height: 35px;
     width: 90px;
@@ -39,7 +39,7 @@ button {
     border: 1.9px solid black;
 }
 
-button:hover {
+#signUpBttn:hover {
     filter: brightness(0.95);
 }
 
