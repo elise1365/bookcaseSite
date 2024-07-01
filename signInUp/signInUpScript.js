@@ -23,20 +23,32 @@ function initApp(){
   return auth;
 };
 
-async function function1() {
+async function signUp() {
   try {
     auth = initApp();
-    let email = "elise@gmail.com";
-    let password = "123WER";
+    let email = document.getElementById("email").value;
+    let password = document.getElementById("password").value;
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    console.log("User created:", userCredential.user);
+    // console.log("User created:", userCredential.user);
   } catch (error) {
-    console.error("Error code:", error.code);
-    console.error("Error message:", error.message);
-    alert(error.message);
+    let errorMessage = error.code;
+    errorMessage = errorMessage.substring(5);
+    showErrorMessage(errorMessage);
   }
 }
 
-// window.onload(function1());
+function showErrorMessage(errorText){
+  let errorBanner = document.getElementById("errorBanner");
+  let errorMessageText = document.getElementById("errorText");
+  let closeButton = document.getElementById("closeButton");
 
-document.getElementById("signUpBttn").addEventListener("click", function1);
+  errorMessageText.textContent = errorText;
+  errorBanner.classList.remove("hidden");
+
+  closeButton.addEventListener('click', () => {
+    errorBanner.classList.add('hidden');
+    errorMessageText.textContent = "";
+  });
+}
+
+document.getElementById("signUpBttn").addEventListener("click", signUp);
