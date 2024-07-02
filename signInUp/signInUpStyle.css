@@ -12,6 +12,7 @@ body {
     font-style: normal;
 }
 
+/* input styling */
 .item {
     padding: 10px;
     margin: 10px 0 0 0;
@@ -33,7 +34,8 @@ input:focus {
     outline: none;
 }
 
-#signUpBttn {
+/* login or sign up button */
+.Bttn {
     font-size: 16px;;
     margin: 10px 10px 0 0;
     height: 35px;
@@ -45,7 +47,7 @@ input:focus {
     font-family: "Kanit", sans-serif;
 }
 
-#signUpBttn:hover {
+.Bttn:hover {
     filter: brightness(0.95);
 }
 
@@ -53,6 +55,7 @@ input:focus {
     font-size: 35px;
 }
 
+/* All this is for the error message banner */
 #errorBanner {
     background-color: #D52941;
     border: 1.9px solid black;

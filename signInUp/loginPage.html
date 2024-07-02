@@ -4,18 +4,27 @@
     <head>
         <title>Login</title>
         <link rel="styleSheet" title="loginPageStyle" href="signInUpStyle.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Anton+SC&family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     </head>
 
     <body>
-        <p></p>
-        <p></p>
-        <p></p>
+        <script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-auth.js"></script>
         <script type="module" src="signInUpScript.js"></script>
+        <p></p>
+        <p></p>
+        <p></p>
         <p class="title">Welcome to ___!</p>
-        <!-- ADD COLOUR -->
+        <div id="errorBanner" class="error hidden">
+            <span id="errorText"></span>
+            <button id="closeButton"><i id="closeIcon" class="material-icons" style="font-size:12px;">close</i></button>
+        </div>
         <input class="item" type="text" id="email" name="email" placeholder="Email...">
         <input class="item" type="text" id="password" name="password" placeholder="Password...">
-        <button>Login</button>
+        <button type="button" id="loginBttn" class="Bttn">Login</button>
         <p>Alternatively, sign up <a href="signUpPage.html">here</a></p>
     </body>
 </html>

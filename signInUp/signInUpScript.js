@@ -3,8 +3,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-let auth;
-
 function initApp(){
     // Your web app's Firebase configuration
   const firebaseConfig = {
@@ -23,9 +21,25 @@ function initApp(){
   return auth;
 };
 
+let auth = initApp();
+
+async function logIn() {
+  try{
+      // auth = initApp();
+      let email = document.getElementById("email").value;
+      let password = document.getElementById("password").value;
+      const user = await signInWithEmailAndPassword(auth, email, password);
+      alert("logged in!");
+  } catch (error) {
+    let errorMessage = error.code;
+    errorMessage = errorMessage.substring(5);
+    showErrorMessage(errorMessage);
+  }
+};
+
 async function signUp() {
   try {
-    auth = initApp();
+    // auth = initApp();
     let email = document.getElementById("email").value;
     let password = document.getElementById("password").value;
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -35,7 +49,7 @@ async function signUp() {
     errorMessage = errorMessage.substring(5);
     showErrorMessage(errorMessage);
   }
-}
+};
 
 function showErrorMessage(errorText){
   let errorBanner = document.getElementById("errorBanner");
@@ -49,6 +63,18 @@ function showErrorMessage(errorText){
     errorBanner.classList.add('hidden');
     errorMessageText.textContent = "";
   });
-}
+};
 
-document.getElementById("signUpBttn").addEventListener("click", signUp);
+document.addEventListener('DOMContentLoaded', () => {
+  const loginButton = document.getElementById("loginBttn");
+  if (loginButton) {
+      loginButton.addEventListener("click", logIn);
+      console.log("Login button listener added");
+  }
+
+  const signUpButton = document.getElementById("signUpBttn");
+  if (signUpButton) {
+      signUpButton.addEventListener("click", signUp);
+      console.log("Sign up button listener added");
+  }
+});
