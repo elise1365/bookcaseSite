@@ -25,11 +25,17 @@ let auth = initApp();
 
 async function logIn() {
   try{
-      // auth = initApp();
+      // get email and password entered
       let email = document.getElementById("email").value;
       let password = document.getElementById("password").value;
+      // log user in
       const user = await signInWithEmailAndPassword(auth, email, password);
-      alert("logged in!");
+      // pass user id to homepage so books previously logged by user ca be accessed
+      const userId = user.user.uid;
+      sessionStorage.setItem("userId", userId);
+      window.location.href = '../mainPage/bookcase.html';
+
+      // alert(userId);
   } catch (error) {
     let errorMessage = error.code;
     errorMessage = errorMessage.substring(5);

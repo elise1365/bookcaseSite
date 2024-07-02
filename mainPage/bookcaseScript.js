@@ -1,6 +1,7 @@
 "use strict"
 
 function drawBooks(listOfBooks) {
+    sessionStorage.getItem("userId");
 
     let bookShelf = document.getElementById("bookShelf");
     for(let i=0;i<listOfBooks.length;i++){
