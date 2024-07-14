@@ -3,6 +3,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getFirestore, doc, getDoc, getDocFromCache } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
+// ToDo: add user name to db, sign up and on the __'s bookcase
+// ToDo: reading goal for the year
+
 let idsAndTitles = new Map();
 
 function initApp(){
@@ -23,6 +26,7 @@ function initApp(){
   return db;
 };
 
+// creates a map of book ids and titles on a users bookshelf
 async function getBookTitlesMap() {
     // let userId = sessionStorage.getItem("userId");
     // setting userId while testing
@@ -50,7 +54,7 @@ async function getBookTitlesMap() {
             }
         }
 
-        drawBooks(Array.from(idsAndTitles.values()));
+        drawBooks(Array.from(idsAndTitles.entries()));
     }
     else{
         // ToDo: add error stuff here
@@ -81,58 +85,81 @@ async function getBookTitle(bookId){
 }
 
 // takes a book id and returns all info on it
-// function getBookInfo(){
+async function getBookInfo(bookId){
+    const db = initApp();
+    const docRef = doc(db, "books", bookId);
+    const docSnap = await getDoc(docRef);
 
-// }
+    if(docSnap.exists()){
+        const data = docSnap.data();
+        let title = data.title;
+        let dateFinished = data.dateFinished;
+        let dateStarted = data.dateStarted;
+        let stars = data.stars;
+        let review = data.review;
+
+        displayFullBookInfo
+    } else{
+        // ToDo: error stuff here!
+        console.log("Book doesnt exist :/")
+    }
+}
+
+// opens a page and shows all user info on the selected book; reivew, data started and finished etc
+// ToDo: editable
+function displayFullBookInfo(title, dateFinished, dateStarted, review, stars){
+
+}
 
 function drawBooks(listOfBooks) {
     sessionStorage.getItem("userId");
-    // getBookTitle();
-
-    const entriesArray = Array.from(idsAndTitles.entries());
-    console.log(entriesArray[0]);
 
     let bookShelf = document.getElementById("bookShelf");
-    for(let i=0;i<listOfBooks.length;i++){
-        // assign a different spine style randomly
-        let randNum = Math.floor(Math.random() * 4) +1;
-        let className;
-        let title = listOfBooks[i];
-        if(randNum == 1){
-            className = "bookSpine1"
-            if(listOfBooks[i].length > 15){
-                title = title.slice(0,15);
-                title += "...";
-            }
-        }
-        else if(randNum == 2){
-            className = "bookSpine2"
-            if(listOfBooks[i].length > 30){
-                title = title.slice(0,30);
-                title += "...";
-            }
-        }
-        else if(randNum == 3){
-            className = "bookSpine3"
-            if(listOfBooks[i].length > 10){
-                title = title.slice(0,10);
-                title += "...";
-            }
-        }
-        else{
-            className = "bookSpine4"
-            if(listOfBooks[i].length > 25){
-                title = title.slice(0,25);
-                title += "...";
-            }
-        }
+    listOfBooks.forEach(([id, title]) => {
+                // assign a different spine style randomly
+                let randNum = Math.floor(Math.random() * 4) +1;
+                let className;
+                if(randNum == 1){
+                    className = "bookSpine1"
+                    if(title.length > 15){
+                        title = title.slice(0,15);
+                        title += "...";
+                    }
+                }
+                else if(randNum == 2){
+                    className = "bookSpine2"
+                    if(title.length > 30){
+                        title = title.slice(0,30);
+                        title += "...";
+                    }
+                }
+                else if(randNum == 3){
+                    className = "bookSpine3"
+                    if(title.length > 10){
+                        title = title.slice(0,10);
+                        title += "...";
+                    }
+                }
+                else{
+                    className = "bookSpine4"
+                    if(title.length > 25){
+                        title = title.slice(0,25);
+                        title += "...";
+                    }
+                }
+        
+                const bookSpine = document.createElement("div");
+                bookSpine.className = className + " bookSpine";
+                bookSpine.id = id
+                bookSpine.innerText = title;
 
-        const bookSpine = document.createElement("div");
-        bookSpine.className = className + " bookSpine";
+                bookSpine.addEventListener("click", () => {
+                    // add a function to get review and all info, then display it
+                    getBookInfo(id);
+                });
 
-        bookSpine.innerText = title;
-        bookShelf.appendChild(bookSpine);
-    }
+                bookShelf.appendChild(bookSpine);
+    })
 };
 
 window.onload = getBookTitlesMap();
