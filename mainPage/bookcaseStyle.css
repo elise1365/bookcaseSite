@@ -1,21 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
 body {
-    border-right: 20px solid #4C1E1E;
-    border-left: 20px solid #4C1E1E;
-    border-bottom: 25px solid #4C1E1E;
+    border-right: 20px solid #25283D;
+    border-left: 20px solid #25283D;
+    border-bottom: 25px solid #25283D;
     box-sizing: border-box;
-    background-color: #D1B187;
+    background-color: #4D9367;
     font-family: 'Lexend', sans-serif;
     font-weight: 400;
 }
 
 #navBar {
-    border-bottom: 10px solid #4C1E1E;
-    border-top: 10px solid #4C1E1E;
+    border-bottom: 10px solid #25283D;
+    border-top: 10px solid #25283D;
     box-sizing: border-box;
     padding: 10px 10px 10px 10px;
-    background-color: #4C1E1E;
+    background-color: #25283D;
 }
 
 #headingText {
@@ -36,19 +36,19 @@ body {
 }
 
 .bookSpine1 {
-    background-color: #384C47;
+    background-color: #DC4441;
     height: 70px;
     margin: 35px 0 0 0;
 }
 
 .bookSpine2 {
-    background-color: #C77562;
+    background-color: #428BB3;
     height: 100px;
     margin: 5px 0 0 0;
 }
 
 .bookSpine3 {
-    background-color: #006E90;
+    background-color: #DE9217;
     height: 50px;
     margin: 55px 0 0 0;
 }

@@ -1,7 +1,49 @@
-"use strict"
+"use strict";
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+function initApp(){
+    // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyBJ2lJaYojtl0Gqi6C2yQyA-X_O-PbIBYU",
+    authDomain: "bookcasesite-f9ce9.firebaseapp.com",
+    projectId: "bookcasesite-f9ce9",
+    storageBucket: "bookcasesite-f9ce9.appspot.com",
+    messagingSenderId: "1028674706274",
+    appId: "1:1028674706274:web:c9f2f9be0fbaefb94fea3b",
+    measurementId: "G-J7K3W3C2PT"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  return db;
+};
+
+// takes a book id and returns all info on it
+// function getBookInfo(){
+
+// }
+
+// async function getBookTitle(){
+//     const db = initApp();
+//     const docRef = doc(db, "Bookcases");
+//     const docSnap = await getDoc(docRef);
+
+//     if (docSnap.exists()){
+//         alert(docSnap.data());
+//     }
+//     else{
+//         alert("nuh uh!");
+//     }
+
+//     sessionStorage.getItem("userId");
+// }
 
 function drawBooks(listOfBooks) {
     sessionStorage.getItem("userId");
+    // getBookTitle();
 
     let bookShelf = document.getElementById("bookShelf");
     for(let i=0;i<listOfBooks.length;i++){
@@ -46,5 +88,5 @@ function drawBooks(listOfBooks) {
         bookShelf.appendChild(bookSpine);
     }
 }
-
+//  window.onload(getBookTitle());
 window.onload = drawBooks(["The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd"]);
