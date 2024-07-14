@@ -33,6 +33,7 @@ body {
     width: 20px;
     writing-mode: vertical-rl;
     font-size: 12px;
+    cursor: pointer;
 }
 
 .bookSpine1 {
@@ -66,4 +67,16 @@ body {
 #bookShelf{
     display: flex;
     flex-wrap: wrap;
+}
+
+button {
+    border: none;
+    background: none;
+    padding: 10px;
+}
+
+#addIcon {
+    background-color: white;
+    cursor: pointer;
+    border-radius: 15px;
 }

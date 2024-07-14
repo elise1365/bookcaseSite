@@ -1,7 +1,9 @@
 "use strict";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, getDocFromCache } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+let idsAndTitles = new Map();
 
 function initApp(){
     // Your web app's Firebase configuration
@@ -21,35 +23,79 @@ function initApp(){
   return db;
 };
 
+async function getBookTitlesMap() {
+    // let userId = sessionStorage.getItem("userId");
+    // setting userId while testing
+    let userId = "rONmYz7B4CYVPCnc65wa";
+
+    const db = initApp();
+    const docRef = doc(db, "bookcases", userId);
+    const docSnap = await getDoc(docRef);
+
+    // get list from users collection in db
+    if (docSnap.exists()){
+        const bookcaseData = docSnap.data();
+        // alert(bookcaseData.listOfBookIds);
+        const listOfBookIds = bookcaseData.listOfBookIds;
+
+        for(let i=0; i<listOfBookIds.length;i++){
+            let bookTitle = await getBookTitle(listOfBookIds[i]);
+
+            if(bookTitle == ""){
+                // ToDo: add error stuff here
+            }
+            else{
+                idsAndTitles.set(listOfBookIds[i], bookTitle);
+                console.log("book added to map successfully");
+            }
+        }
+
+        drawBooks(Array.from(idsAndTitles.values()));
+    }
+    else{
+        // ToDo: add error stuff here
+        alert("nuh uh!");
+    }
+}
+
+// takes a book id and returns title
+// done seperately from getBookInfo for simplicity
+async function getBookTitle(bookId){
+    const db = initApp();
+    const docRef = doc(db, "books", bookId);
+    const docSnap = await getDoc(docRef);
+
+    // get list from users collection in db
+    if (docSnap.exists()){
+        const bookData = docSnap.data();
+        // alert(bookData.title);
+        let bookTitle = await bookData.title;
+        return bookTitle;
+    }
+    else{
+        // ToDo: add error stuff here
+        // alert("nuh uh!");
+        console.log("book doesn't exist");
+        return "";
+    }
+}
+
 // takes a book id and returns all info on it
 // function getBookInfo(){
 
-// }
-
-// async function getBookTitle(){
-//     const db = initApp();
-//     const docRef = doc(db, "Bookcases");
-//     const docSnap = await getDoc(docRef);
-
-//     if (docSnap.exists()){
-//         alert(docSnap.data());
-//     }
-//     else{
-//         alert("nuh uh!");
-//     }
-
-//     sessionStorage.getItem("userId");
 // }
 
 function drawBooks(listOfBooks) {
     sessionStorage.getItem("userId");
     // getBookTitle();
 
+    const entriesArray = Array.from(idsAndTitles.entries());
+    console.log(entriesArray[0]);
+
     let bookShelf = document.getElementById("bookShelf");
     for(let i=0;i<listOfBooks.length;i++){
         // assign a different spine style randomly
         let randNum = Math.floor(Math.random() * 4) +1;
-        // alert(randNum);
         let className;
         let title = listOfBooks[i];
         if(randNum == 1){
@@ -87,6 +133,7 @@ function drawBooks(listOfBooks) {
         bookSpine.innerText = title;
         bookShelf.appendChild(bookSpine);
     }
-}
-//  window.onload(getBookTitle());
-window.onload = drawBooks(["The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd"]);
+};
+
+window.onload = getBookTitlesMap();
+// window.onload = drawBooks(["The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd"]);
