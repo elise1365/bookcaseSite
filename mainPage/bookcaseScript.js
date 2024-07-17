@@ -98,17 +98,17 @@ async function getBookInfo(bookId){
         let stars = data.stars;
         let review = data.review;
 
-        displayFullBookInfo
+        sessionStorage.setItem("title", title);
+        sessionStorage.setItem("dateFinished", dateFinished);
+        sessionStorage.setItem("dateStarted", dateStarted);
+        sessionStorage.setItem("stars", stars);
+        sessionStorage.setItem("review", review);
+
+        window.location.href = '../mainPage/fullInfoPage.html';
     } else{
         // ToDo: error stuff here!
         console.log("Book doesnt exist :/")
     }
-}
-
-// opens a page and shows all user info on the selected book; reivew, data started and finished etc
-// ToDo: editable
-function displayFullBookInfo(title, dateFinished, dateStarted, review, stars){
-
 }
 
 function drawBooks(listOfBooks) {

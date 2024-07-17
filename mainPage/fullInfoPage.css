@@ -1,0 +1,57 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+body {
+    background-color: #4D9367;
+    font-family: 'Lexend', sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#container {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    width: 800px;
+    border-radius: 25px;
+    padding: 0 0 0 20px;
+}
+
+#backBttn {
+    background: none;
+    border: none;
+    padding: 15px;
+}
+
+#backBttnIcon {
+    cursor: pointer;
+}
+
+#title {
+    font-weight: 700;
+    padding: 0 0 0 20px;
+    font-size: 30px;
+}
+
+#firstLine {
+    display: flex;
+}
+
+.filledStar {
+    color: gold;
+}
+
+#review {
+    font-style: italic;
+}
+
+.date {
+    margin-top: auto;
+    padding: 0 20px 0 0;
+}
+
+#lastLine{
+    display: flex;
+}
