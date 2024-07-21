@@ -94,7 +94,8 @@ async function passToFullInfoPage(bookId){
 
     if(docSnap.exists()){
         sessionStorage.setItem("bookId", bookId);
-        sessionStorage.setItem("userID", userId);
+        // alert(userId);
+        sessionStorage.setItem("userId", userId);
 
         window.location.href = '../mainPage/fullInfoPage.html';
     } else{

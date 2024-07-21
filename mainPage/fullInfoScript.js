@@ -155,6 +155,7 @@ function changeInputToElement(id){
 
 async function updateElement(item, value){
     const db = initApp();
+    // alert(userId);
     const bookInfo = collection(db, "books");
     const q = query(bookInfo, where("userID", "==", userId));
     const querySnapshot = await getDocs(q);
@@ -192,8 +193,17 @@ function saveChanges(){
     // rewrite each element into the db, regardless of whether its changed
     let titleElement = document.getElementById("title");
     updateElement("title", titleElement.innerText);
+    
     let reviewElement = document.getElementById("review");
     updateElement("review", reviewElement.innerHTML);
+
+    let dateFinishedElement = document.getElementById("dateFinished");
+    updateElement("dateFinished", dateFinishedElement.innerHTML);
+    let dateStartedElement = document.getElementById("dateStarted");
+    updateElement("dateStarted", dateStartedElement.innerHTML);
+    dateStarted = dateStartedElement.innerHTML;
+    dateFinished = dateFinishedElement.innerHTML;
+    addDates();
 }
 
 function editMode(){
