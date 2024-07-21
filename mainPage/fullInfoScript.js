@@ -141,7 +141,17 @@ function changeElementToInput(id, inputType){
     let newElement = document.createElement("input");
     newElement.id = id;
     newElement.type = inputType;
-    newElement.value = element.innerHTML;
+    if(inputType == "date"){
+        if(id == "dateStarted"){
+            newElement.value = dateStarted;
+        }
+        else{
+            newElement.value = dateFinished;
+        }
+    }
+    else{
+        newElement.value = element.innerHTML;
+    }
     element.parentNode.replaceChild(newElement, element);
 }
 
@@ -193,7 +203,7 @@ function saveChanges(){
     // rewrite each element into the db, regardless of whether its changed
     let titleElement = document.getElementById("title");
     updateElement("title", titleElement.innerText);
-    
+
     let reviewElement = document.getElementById("review");
     updateElement("review", reviewElement.innerHTML);
 
