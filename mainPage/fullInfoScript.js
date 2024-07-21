@@ -1,14 +1,57 @@
 "use strict";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getDoc, getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { getDoc, getFirestore, doc, updateDoc, getDocs, query, collection, where } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-let title = sessionStorage.getItem("title");
-let dateFinished = sessionStorage.getItem("dateFinished");
-let dateStarted = sessionStorage.getItem("dateStarted");
-let stars = sessionStorage.getItem("stars");
-let review = sessionStorage.getItem("review");
+let bookId = sessionStorage.getItem("bookId");
+let title;
+let dateFinished;
+let dateStarted;
+let stars;
+let review;
 let userId = sessionStorage.getItem("userId");
+
+function initApp(){
+    // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyBJ2lJaYojtl0Gqi6C2yQyA-X_O-PbIBYU",
+    authDomain: "bookcasesite-f9ce9.firebaseapp.com",
+    projectId: "bookcasesite-f9ce9",
+    storageBucket: "bookcasesite-f9ce9.appspot.com",
+    messagingSenderId: "1028674706274",
+    appId: "1:1028674706274:web:c9f2f9be0fbaefb94fea3b",
+    measurementId: "G-J7K3W3C2PT"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  return db;
+};
+
+async function getBookInfo(){
+    const db = initApp();
+    const docRef = doc(db, "books", bookId);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()){
+        const bookData = docSnap.data();
+        title = await bookData.title;
+        review = await bookData.review;
+        stars = await bookData.stars;
+        dateStarted = await bookData.dateStarted;
+        dateFinished = await bookData.dateFinished;
+
+        addTitle();
+        addStars();
+        addReview();
+        addDates();
+    }
+    else{
+        console.log("book doesnt exist");
+        // ToDo: error stuff
+    }
+}
 
 function addTitle() {
     let titleElement = document.getElementById("title");
@@ -37,6 +80,18 @@ function addStars() {
 function addReview() {
     let reviewElement = document.getElementById("review");
     reviewElement.innerText = "'" + review + "'";
+}
+
+function addDates() {
+    let dateStartedElement = document.getElementById("dateStarted");
+    dateStartedElement.className = "date";
+    let date = convertToDate(dateStarted);
+    dateStartedElement.innerText = "Date started: " + date;
+
+    let dateFinishedElement = document.getElementById("dateFinished");
+    date = convertToDate(dateFinished);
+    dateFinishedElement.className = "dateFinished";
+    dateFinishedElement.innerText = "Date finished: " + date;
 }
 
 function convertToDate(dateAsNum){
@@ -81,33 +136,6 @@ function convertToDate(dateAsNum){
     return date;
 }
 
-function addDates() {
-    let dateStartedElement = document.getElementById("dateStarted");
-    dateStartedElement.className = "date";
-    let date = convertToDate(dateStarted);
-    dateStartedElement.innerText = "Date started: " + date;
-
-    let dateFinishedElement = document.getElementById("dateFinished");
-    date = convertToDate(dateFinished);
-    dateFinishedElement.className = "dateFinished";
-    dateFinishedElement.innerText = "Date finished: " + date;
-}
-
-function editMode(){
-    // change the button from edit to save
-    let editBttn = document.getElementById("editBttnIcon")
-    editBttn.textContent = "check";
-    editBttn.id = "saveBttnIcon";
-    editBttn.removeEventListener("click", editMode);
-    editBttn.addEventListener("click", saveChanges);
-
-    // get each item from the page and convert to an input box for editing
-    changeElementToInput("title", "text");
-    changeElementToInput("review", "text");
-    changeElementToInput("dateFinished", "date");
-    changeElementToInput("dateStarted", "date");
-}
-
 function changeElementToInput(id, inputType){
     let element = document.getElementById(id);
     let newElement = document.createElement("input");
@@ -125,42 +153,30 @@ function changeInputToElement(id){
     input.parentNode.replaceChild(newElement, input);
 }
 
-function initApp(){
-    // Your web app's Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyBJ2lJaYojtl0Gqi6C2yQyA-X_O-PbIBYU",
-    authDomain: "bookcasesite-f9ce9.firebaseapp.com",
-    projectId: "bookcasesite-f9ce9",
-    storageBucket: "bookcasesite-f9ce9.appspot.com",
-    messagingSenderId: "1028674706274",
-    appId: "1:1028674706274:web:c9f2f9be0fbaefb94fea3b",
-    measurementId: "G-J7K3W3C2PT"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  return db;
-};
-
 async function updateElement(item, value){
     const db = initApp();
-    console.log(userId);
-    const userDocRef = doc(db, "bookcases", userId);
-    const docSnap = await getDoc(userDocRef);
+    const bookInfo = collection(db, "books");
+    const q = query(bookInfo, where("userID", "==", userId));
+    const querySnapshot = await getDocs(q);
 
-    try {
-        await updateDoc(userDocRef, {
-            [item]: value  
+    if (!querySnapshot.empty){
+        querySnapshot.forEach(async (doc) => {
+            try {
+                await updateDoc(doc.ref, {
+                    [item]: value  
+                });
+                console.log("Document updated successfully");
+            } catch (error) {
+                console.error("Error updating document: ", error);
+            }
         });
-        console.log("Document updated successfully");
-    } catch (error) {
-        console.error("Error updating document: ", error);
+    } else{
+        // ToDo: add error stuff here
+        console.log("document not found");
     }
 }
 
 function saveChanges(){
-    updateElement("title", "the");
     // change the button from edit to save
     let editBttn = document.getElementById("saveBttnIcon")
     editBttn.innerText = "edit";
@@ -172,13 +188,38 @@ function saveChanges(){
     changeInputToElement("review");
     changeInputToElement("dateFinished");
     changeInputToElement("dateStarted");
+
+    // rewrite each element into the db, regardless of whether its changed
+    let titleElement = document.getElementById("title");
+    updateElement("title", titleElement.innerText);
+    let reviewElement = document.getElementById("review");
+    updateElement("review", reviewElement.innerHTML);
 }
 
+function editMode(){
+    // change the button from edit to save
+    let editBttn = document.getElementById("editBttnIcon")
+    editBttn.innerText = "check";
+    editBttn.id = "saveBttnIcon";
+    editBttn.removeEventListener("click", editMode);
+    editBttn.addEventListener("click", saveChanges);
+
+    // need to remove the '' from the review
+    let reviewElement = document.getElementById("review");
+    let reviewText = reviewElement.innerHTML;
+    reviewText = reviewText.slice(1,-1);
+    reviewElement.innerHTML = reviewText;
+
+    // get each item from the page and convert to an input box for editing
+    changeElementToInput("title", "text");
+    changeElementToInput("review", "text");
+    changeElementToInput("dateFinished", "date");
+    changeElementToInput("dateStarted", "date");
+}
+
+// function loading stuff
 window.onload = function() {
-    addTitle();
-    addStars();
-    addReview();
-    addDates();
+    getBookInfo();
 };
 
 document.addEventListener("DOMContentLoaded", () => {

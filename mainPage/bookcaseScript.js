@@ -8,6 +8,10 @@ import { collection, query, where, getFirestore, doc, getDocs, getDoc, getDocFro
 
 let idsAndTitles = new Map();
 
+// let userId = sessionStorage.getItem("userId");
+// setting userId while testing
+let userId = "XwgBQfethaWFOd3rodpvh2tunRk1";
+
 function initApp(){
     // Your web app's Firebase configuration
   const firebaseConfig = {
@@ -28,10 +32,6 @@ function initApp(){
 
 // creates a map of book ids and titles on a users bookshelf
 async function getBookTitlesMap() {
-    // let userId = sessionStorage.getItem("userId");
-    // setting userId while testing
-    let userId = "XwgBQfethaWFOd3rodpvh2tunRk1";
-
     const db = initApp();
     const bookCasesCollection = collection(db, "bookcases");
     const q = query(bookCasesCollection, where("userID", "==", userId));
@@ -66,7 +66,6 @@ async function getBookTitlesMap() {
 }
 
 // takes a book id and returns title
-// done seperately from getBookInfo for simplicity
 async function getBookTitle(bookId){
     const db = initApp();
     const docRef = doc(db, "books", bookId);
@@ -88,26 +87,14 @@ async function getBookTitle(bookId){
 }
 
 // takes a book id and returns all info on it
-async function getBookInfo(bookId){
+async function passToFullInfoPage(bookId){
     const db = initApp();
     const docRef = doc(db, "books", bookId);
     const docSnap = await getDoc(docRef);
 
     if(docSnap.exists()){
-        const data = docSnap.data();
-        let title = data.title;
-        let dateFinished = data.dateFinished;
-        let dateStarted = data.dateStarted;
-        let stars = data.stars;
-        let review = data.review;
-        let userId = data.userId;
-
-        sessionStorage.setItem("title", title);
-        sessionStorage.setItem("dateFinished", dateFinished);
-        sessionStorage.setItem("dateStarted", dateStarted);
-        sessionStorage.setItem("stars", stars);
-        sessionStorage.setItem("review", review);
-        sessionStorage.setItem("userId", userId);
+        sessionStorage.setItem("bookId", bookId);
+        sessionStorage.setItem("userID", userId);
 
         window.location.href = '../mainPage/fullInfoPage.html';
     } else{
@@ -155,12 +142,12 @@ function drawBooks(listOfBooks) {
         
                 const bookSpine = document.createElement("div");
                 bookSpine.className = className + " bookSpine";
-                bookSpine.id = id
+                bookSpine.id = id;
                 bookSpine.innerText = title;
 
                 bookSpine.addEventListener("click", () => {
                     // add a function to get review and all info, then display it
-                    getBookInfo(id);
+                    passToFullInfoPage(id);
                 });
 
                 bookShelf.appendChild(bookSpine);
