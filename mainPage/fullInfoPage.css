@@ -19,10 +19,10 @@ body {
     padding: 0 0 0 20px;
 }
 
-#backBttn {
+.bttn {
     background: none;
     border: none;
-    padding: 15px;
+    padding: 20px;
 }
 
 #backBttnIcon {
@@ -31,7 +31,6 @@ body {
 
 #title {
     font-weight: 700;
-    padding: 0 0 0 20px;
     font-size: 30px;
 }
 
@@ -54,4 +53,8 @@ body {
 
 #lastLine{
     display: flex;
+}
+
+#editBttnIcon{
+    cursor: pointer;
 }

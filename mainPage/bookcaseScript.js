@@ -1,7 +1,7 @@
 "use strict";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getFirestore, doc, getDoc, getDocFromCache } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { collection, query, where, getFirestore, doc, getDocs, getDoc, getDocFromCache } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 // ToDo: add user name to db, sign up and on the __'s bookcase
 // ToDo: reading goal for the year
@@ -30,31 +30,34 @@ function initApp(){
 async function getBookTitlesMap() {
     // let userId = sessionStorage.getItem("userId");
     // setting userId while testing
-    let userId = "rONmYz7B4CYVPCnc65wa";
+    let userId = "XwgBQfethaWFOd3rodpvh2tunRk1";
 
     const db = initApp();
-    const docRef = doc(db, "bookcases", userId);
-    const docSnap = await getDoc(docRef);
+    const bookCasesCollection = collection(db, "bookcases");
+    const q = query(bookCasesCollection, where("userID", "==", userId));
+    const querySnapshot = await getDocs(q);
 
     // get list from users collection in db
-    if (docSnap.exists()){
-        const bookcaseData = docSnap.data();
-        // alert(bookcaseData.listOfBookIds);
-        const listOfBookIds = bookcaseData.listOfBookIds;
+    if (!querySnapshot.empty){
+        querySnapshot.forEach((doc) => {
+            const bookcaseData = doc.data();
+            const listOfBookIds = bookcaseData.listOfBookIds;
 
-        for(let i=0; i<listOfBookIds.length;i++){
-            let bookTitle = await getBookTitle(listOfBookIds[i]);
-
-            if(bookTitle == ""){
-                // ToDo: add error stuff here
-            }
-            else{
-                idsAndTitles.set(listOfBookIds[i], bookTitle);
-                console.log("book added to map successfully");
-            }
-        }
-
-        drawBooks(Array.from(idsAndTitles.entries()));
+            (async () => {
+                for(let i=0; i<listOfBookIds.length;i++){
+                    let bookTitle = await getBookTitle(listOfBookIds[i]);
+        
+                    if(bookTitle == ""){
+                        // ToDo: add error stuff here
+                    }
+                    else{
+                        idsAndTitles.set(listOfBookIds[i], bookTitle);
+                        console.log("book added to map successfully");
+                    }
+                }
+                drawBooks(Array.from(idsAndTitles.entries()));
+            })();
+        })
     }
     else{
         // ToDo: add error stuff here
@@ -97,12 +100,14 @@ async function getBookInfo(bookId){
         let dateStarted = data.dateStarted;
         let stars = data.stars;
         let review = data.review;
+        let userId = data.userId;
 
         sessionStorage.setItem("title", title);
         sessionStorage.setItem("dateFinished", dateFinished);
         sessionStorage.setItem("dateStarted", dateStarted);
         sessionStorage.setItem("stars", stars);
         sessionStorage.setItem("review", review);
+        sessionStorage.setItem("userId", userId);
 
         window.location.href = '../mainPage/fullInfoPage.html';
     } else{
