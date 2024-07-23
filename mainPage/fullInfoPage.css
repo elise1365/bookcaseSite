@@ -58,3 +58,7 @@ body {
 #editBttnIcon{
     cursor: pointer;
 }
+
+.editableStars {
+    cursor: pointer;
+}

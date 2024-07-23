@@ -61,15 +61,18 @@ function addTitle() {
 function addStars() {
     let starsElement = document.getElementById("stars");
 
-    for (let i=0;i<=5;i++){
+    // wipe starsElement clean before adding the stars, useful for edit mode
+    starsElement.innerHTML = "";
+
+    for (let i=0;i<5;i++){
         let iconElement = document.createElement("i");
 
-        if(i <= stars){
-            iconElement.className = 'material-icons filledStar ${i}';
+        if(i < stars){
+            iconElement.className = 'material-icons filledStar';
             iconElement.innerText = "star";
         }
         else{
-            iconElement.className = 'material-icons ${i}';
+            iconElement.className = 'material-icons';
             iconElement.innerText = "star_outline";
         }
 
@@ -163,6 +166,37 @@ function changeInputToElement(id){
     input.parentNode.replaceChild(newElement, input);
 }
 
+function createEditableStars(){
+    let starsElement = document.getElementById("stars");
+    starsElement.innerHTML = "";
+
+    for (let i=0;i<5;i++){
+        let iconElement = document.createElement("i");
+        iconElement.className = 'material-icons editableStars';
+        iconElement.innerText = "star_outline";
+        iconElement.addEventListener("click", () => fillStars(i));
+        starsElement.appendChild(iconElement);
+    }
+}
+
+function fillStars(index){
+    let starsElement = document.getElementById("stars");
+    let allStars = starsElement.getElementsByTagName("i");
+
+    stars = index + 1;
+
+    for(let i=0;i<5;i++){
+        if(i<=index){
+            allStars[i].classList.add("filledStar");
+            allStars[i].innerText = "star";
+        }
+        else{
+            allStars[i].classList.remove("filledStar");
+            allStars[i].innerText = "star_outline";
+        }
+    }
+}
+
 async function updateElement(item, value){
     const db = initApp();
     // alert(userId);
@@ -206,6 +240,7 @@ function saveChanges(){
 
     let reviewElement = document.getElementById("review");
     updateElement("review", reviewElement.innerHTML);
+    addReview();
 
     let dateFinishedElement = document.getElementById("dateFinished");
     updateElement("dateFinished", dateFinishedElement.innerHTML);
@@ -214,6 +249,9 @@ function saveChanges(){
     dateStarted = dateStartedElement.innerHTML;
     dateFinished = dateFinishedElement.innerHTML;
     addDates();
+
+    updateElement("stars", stars);
+    addStars();
 }
 
 function editMode(){
@@ -235,6 +273,9 @@ function editMode(){
     changeElementToInput("review", "text");
     changeElementToInput("dateFinished", "date");
     changeElementToInput("dateStarted", "date");
+
+    // convert stars into editable
+    createEditableStars();
 }
 
 // function loading stuff
