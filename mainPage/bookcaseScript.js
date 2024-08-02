@@ -157,3 +157,13 @@ function drawBooks(listOfBooks) {
 
 window.onload = getBookTitlesMap();
 // window.onload = drawBooks(["The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd"]);
+
+document.addEventListener("DOMContentLoaded", () => {
+    const addBookBttn = document.getElementById("addIcon");
+    if(addBookBttn){
+        addBookBttn.addEventListener("click", () => {
+            sessionStorage.setItem("userId", userId);
+            window.location.href = '../mainPage/addBookPage.html';
+        });
+    }
+});

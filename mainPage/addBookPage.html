@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>Add book</title>
+        <link rel="styleSheet" title="homePageStyle" href="addBookStyle.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    </head>
+    <body>
+        <p></p>
+        <div id="container">
+            <div class="oneLine">
+                <button id="backBttn" class="bttn"><i class="material-icons">arrow_back</i></button>
+                <p>Add title:</p>
+                <input id="title"></input>
+            </div>
+            <p id="stars"></p>
+            <p id="reviewInstruction">Write your review here: </p>
+            <textarea id="review"></textarea>
+            <div class="oneLine">
+                <div class="oneLine dateContainer">
+                    <p>Date started: </p>
+                    <input id="dateStarted" class="dateInput" type="date"></input>
+                </div>
+                <div class="oneLine dateContainer">
+                    <p>Date finished: </p>
+                    <input id="dateFinished" class="dateInput" type="date"></input>
+                </div>
+            </div>
+            <p></p>
+            <button id="checkBttn" class="bttn"><i class="material-icons">check</i></button>
+        </div>
+        <script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-firestore.js"></script>
+        <script type="module" src="addBookScript.js"></script>
+    </body>
+</html>
