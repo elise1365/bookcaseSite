@@ -197,6 +197,22 @@ function fillStars(index){
     }
 }
 
+function changeReviewToTextArea(){
+    let reviewElement = document.getElementById("review");
+    let newElement = document.createElement("textarea");
+    newElement.id = "review";
+    newElement.value = reviewElement.innerHTML;
+    reviewElement.parentNode.replaceChild(newElement, reviewElement);
+}
+
+function convertTextAreaToP(){
+    let textareaElement = document.getElementById("review");
+    let reviewElement = document.createElement("p");
+    reviewElement.id = "review";
+    reviewElement.innertext = textareaElement.value;
+    textareaElement.parentNode.replaceChild(reviewElement, textareaElement);
+}
+
 async function updateElement(item, value){
     const db = initApp();
     // alert(userId);
@@ -230,7 +246,8 @@ function saveChanges(){
     editBttn.addEventListener("click", editMode);
 
     changeInputToElement("title");
-    changeInputToElement("review");
+    // changeInputToElement("review");
+    convertTextAreaToP();
     changeInputToElement("dateFinished");
     changeInputToElement("dateStarted");
 
@@ -239,7 +256,8 @@ function saveChanges(){
     updateElement("title", titleElement.innerText);
 
     let reviewElement = document.getElementById("review");
-    updateElement("review", reviewElement.innerHTML);
+    updateElement("review", reviewElement.innertext);
+    review = reviewElement.innertext;
     addReview();
 
     let dateFinishedElement = document.getElementById("dateFinished");
@@ -270,7 +288,8 @@ function editMode(){
 
     // get each item from the page and convert to an input box for editing
     changeElementToInput("title", "text");
-    changeElementToInput("review", "text");
+    // changeElementToInput("review", "text");
+    changeReviewToTextArea();
     changeElementToInput("dateFinished", "date");
     changeElementToInput("dateStarted", "date");
 
