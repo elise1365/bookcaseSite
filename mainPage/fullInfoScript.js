@@ -246,7 +246,6 @@ function saveChanges(){
     editBttn.addEventListener("click", editMode);
 
     changeInputToElement("title");
-    // changeInputToElement("review");
     convertTextAreaToP();
     changeInputToElement("dateFinished");
     changeInputToElement("dateStarted");
