@@ -144,6 +144,7 @@ function changeElementToInput(id, inputType){
     let newElement = document.createElement("input");
     newElement.id = id;
     newElement.type = inputType;
+
     if(inputType == "date"){
         if(id == "dateStarted"){
             newElement.value = dateStarted;
@@ -155,6 +156,7 @@ function changeElementToInput(id, inputType){
     else{
         newElement.value = element.innerHTML;
     }
+
     element.parentNode.replaceChild(newElement, element);
 }
 
@@ -173,7 +175,14 @@ function createEditableStars(){
     for (let i=0;i<5;i++){
         let iconElement = document.createElement("i");
         iconElement.className = 'material-icons editableStars';
-        iconElement.innerText = "star_outline";
+
+        if(i<=(stars-1)){
+            iconElement.innerText = "star";
+        }
+        else{
+            iconElement.innerText = "star_outline";
+        }
+
         iconElement.addEventListener("click", () => fillStars(i));
         starsElement.appendChild(iconElement);
     }
@@ -187,11 +196,9 @@ function fillStars(index){
 
     for(let i=0;i<5;i++){
         if(i<=index){
-            allStars[i].classList.add("filledStar");
             allStars[i].innerText = "star";
         }
         else{
-            allStars[i].classList.remove("filledStar");
             allStars[i].innerText = "star_outline";
         }
     }
