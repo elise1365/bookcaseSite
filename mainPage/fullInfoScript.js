@@ -224,7 +224,8 @@ async function updateElement(item, value){
     const db = initApp();
     // alert(userId);
     const bookInfo = collection(db, "books");
-    const q = query(bookInfo, where("userID", "==", userId));
+    // alert(title);
+    const q = query(bookInfo, where("title", "==", title));
     const querySnapshot = await getDocs(q);
 
     if (!querySnapshot.empty){

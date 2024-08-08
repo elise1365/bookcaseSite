@@ -101,7 +101,6 @@ async function addBookToDb(){
             const bookcaseData = doc.data();
             listOfBookIds = bookcaseData.listOfBookIds;
             docId = doc.id;
-            alert(docId);
         })
     }
     else{

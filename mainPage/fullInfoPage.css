@@ -33,7 +33,7 @@ body {
 
 #title {
     font-weight: 700;
-    font-size: 20px;
+    font-size: 25px;
 }
 
 .oneLine {
@@ -46,11 +46,13 @@ body {
 
 #review {
     font-style: italic;
+    font-size: 18px;
 }
 
 .date {
     margin-top: auto;
     padding: 0 20px 0 0;
+    font-size: 18px;
 }
 
 #editBttnIcon{
