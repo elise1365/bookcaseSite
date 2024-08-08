@@ -2,6 +2,7 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { collection, query, where, getFirestore, doc, getDocs, getDoc, getDocFromCache } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
 // ToDo: add user name to db, sign up and on the __'s bookcase
 // ToDo: reading goal for the year
@@ -28,6 +29,24 @@ function initApp(){
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   return db;
+};
+
+function initAppAuth(){
+    // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyBJ2lJaYojtl0Gqi6C2yQyA-X_O-PbIBYU",
+    authDomain: "bookcasesite-f9ce9.firebaseapp.com",
+    projectId: "bookcasesite-f9ce9",
+    storageBucket: "bookcasesite-f9ce9.appspot.com",
+    messagingSenderId: "1028674706274",
+    appId: "1:1028674706274:web:c9f2f9be0fbaefb94fea3b",
+    measurementId: "G-J7K3W3C2PT"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  return auth;
 };
 
 // creates a map of book ids and titles on a users bookshelf
@@ -155,6 +174,18 @@ function drawBooks(listOfBooks) {
     })
 };
 
+function logout(){
+    let auth = initAppAuth();
+
+    signOut(auth).then(() => {
+        console.log("sign out successful!");
+    }).catch((error) => {
+        // ToDo: error stuff!
+        console.log("error logging out: ");
+        console.log(error);
+    })
+}
+
 window.onload = getBookTitlesMap();
 // window.onload = drawBooks(["The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd"]);
 
@@ -165,5 +196,13 @@ document.addEventListener("DOMContentLoaded", () => {
             sessionStorage.setItem("userId", userId);
             window.location.href = '../mainPage/addBookPage.html';
         });
+    }
+
+    const logoutBttn = document.getElementById("logoutBttn");
+    if(logoutBttn){
+        logoutBttn.addEventListener("click", () => {
+            logout();
+            window.location.href = "../signInUp/loginPage.html";
+        })
     }
 });

@@ -17,6 +17,7 @@ body {
     box-sizing: border-box;
     padding: 10px 10px 10px 10px;
     background-color: #25283D;
+    justify-content: center;
 }
 
 #headingText {
@@ -80,4 +81,22 @@ button {
     background-color: white;
     cursor: pointer;
     border-radius: 15px;
+}
+
+#editIcon {
+    color: white;
+    cursor: pointer;
+}
+
+#oneline {
+    display: flex;
+}
+
+.spacer {
+    flex-grow: 1;
+}
+
+#logoutBttn{
+    color: white;
+    cursor: pointer;
 }

@@ -10,7 +10,13 @@
     <body>
         <section>
            <nav id="navBar">
-            <p id="headingText">Elise's bookshelf</p>
+                <div id="oneline">
+                    <div class="spacer"></div>
+                    <p id="headingText">Elise's bookshelf</p>
+                    <button><i id="editIcon" class="material-icons">edit</i></button>
+                    <div class="spacer"></div>
+                    <button><i id="logoutBttn" class="material-icons">logout</i></button>
+                </div>
            </nav>
         </section>
         <section>
@@ -22,6 +28,7 @@
         </section>
         <script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-app.js"></script>
         <script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-firestore.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-auth.js"></script>
         <script type="module" src="bookcaseScript.js"></script>
     </body>
 </html>
