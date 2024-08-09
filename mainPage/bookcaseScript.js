@@ -1,7 +1,7 @@
 "use strict";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { collection, query, where, getFirestore, doc, getDocs, getDoc, getDocFromCache } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { collection, query, where, getFirestore, doc, getDocs, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
 // ToDo: add user name to db, sign up and on the __'s bookcase
@@ -12,6 +12,7 @@ let idsAndTitles = new Map();
 // let userId = sessionStorage.getItem("userId");
 // setting userId while testing
 let userId = "XwgBQfethaWFOd3rodpvh2tunRk1";
+let username;
 
 function initApp(){
     // Your web app's Firebase configuration
@@ -48,6 +49,92 @@ function initAppAuth(){
   const auth = getAuth(app);
   return auth;
 };
+
+async function getName(){
+    let db = initApp();
+    const bookcasesCollection = collection(db, "bookcases");
+    const q = query(bookcasesCollection, where("userID", "==", userId));
+    const snapshot = await getDocs(q);
+
+    if(!snapshot.empty){
+        snapshot.forEach((doc) => {
+            const bookcaseData = doc.data();
+            username = bookcaseData.name;
+        });
+
+        let usernameElement = document.getElementById("headingText");
+        if(username.length > 0 && username[username.length-1] == "s"){
+            usernameElement.textContent = username + "' bookshelf";
+        }
+        else{
+            usernameElement.textContent = username + "'s bookshelf";
+        }
+    }
+    else{
+        console.log("user doesnt exist");
+        // ToDo: add error stuff here!
+    }
+}
+
+// user can change username
+async function setName(){
+    // get new username from input element
+    let inputElement = document.getElementById("headingInput");
+    let newUsername = inputElement.value;
+
+    const db = initApp();
+    const userInfo = collection(db, "bookcases");
+    const q = query(userInfo, where("userID", "==", userId));
+    const querySnapshot = await getDocs(q);
+
+    if(!querySnapshot.empty){
+        querySnapshot.forEach(async (doc) => {
+            try {
+                await updateDoc(doc.ref, {
+                    ["name"]: newUsername
+                });
+                username = newUsername;
+                getName();
+                console.log("username updated successfully!");
+
+                // convert input element back to p
+                let inputElement = document.getElementById("headingInput");
+                let newElement = document.createElement("p");
+                newElement.id = "headingText";
+                inputElement.parentNode.replaceChild(newElement, inputElement);
+
+                // convert save button to edit button
+                let saveBttnElement = document.getElementById("saveBttn");
+                saveBttnElement.innerText = "edit";
+                saveBttnElement.id = "editIcon";
+                saveBttnElement.removeEventListener("click", setName);
+                saveBttnElement.addEventListener("click", changeUsername);
+            } catch (error) {
+                console.log("Error updating doc: ", error);
+            }
+        })
+    } else {
+        // ToDo: error stuff!
+        console.log("doc not found!");
+    }
+}
+
+function changeUsername(){
+    // change edit button to save
+    let editBttn = document.getElementById("editIcon");
+    editBttn.innerHTML = "check";
+    editBttn.id = "saveBttn";
+    editBttn.removeEventListener("click", changeUsername);
+    editBttn.addEventListener("click", setName);
+
+    // convert headingText to headingInput
+    let usernameElement = document.getElementById("headingText");
+    let inputElement = document.createElement("input");
+    inputElement.id = "headingInput";
+    inputElement.type = "text";
+    inputElement.value = username;
+    usernameElement.parentNode.replaceChild(inputElement, usernameElement);
+}
 
 // creates a map of book ids and titles on a users bookshelf
 async function getBookTitlesMap() {
@@ -187,6 +274,7 @@ function logout(){
 }
 
 window.onload = getBookTitlesMap();
+window.onload = getName();
 // window.onload = drawBooks(["The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd"]);
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -203,6 +291,13 @@ document.addEventListener("DOMContentLoaded", () => {
         logoutBttn.addEventListener("click", () => {
             logout();
             window.location.href = "../signInUp/loginPage.html";
+        })
+    }
+
+    const editBttn = document.getElementById("editIcon");
+    if(editBttn){
+        editBttn.addEventListener("click", () => {
+            changeUsername();
         })
     }
 });

@@ -236,7 +236,7 @@ async function updateElement(item, value){
                 });
                 console.log("Document updated successfully");
             } catch (error) {
-                console.error("Error updating document: ", error);
+                console.log("Error updating document: ", error);
             }
         });
     } else{

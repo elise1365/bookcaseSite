@@ -100,3 +100,12 @@ button {
     color: white;
     cursor: pointer;
 }
+
+#saveBttn {
+    color: white;
+    cursor: pointer;
+}
+
+input {
+    border-radius: 15px;
+}
