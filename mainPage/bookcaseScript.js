@@ -4,7 +4,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase
 import { collection, query, where, getFirestore, doc, getDocs, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-// ToDo: add user name to db, sign up and on the __'s bookcase
 // ToDo: reading goal for the year
 
 let idsAndTitles = new Map();
@@ -291,13 +290,21 @@ document.addEventListener("DOMContentLoaded", () => {
         logoutBttn.addEventListener("click", () => {
             logout();
             window.location.href = "../signInUp/loginPage.html";
-        })
+        });
     }
 
     const editBttn = document.getElementById("editIcon");
     if(editBttn){
         editBttn.addEventListener("click", () => {
             changeUsername();
-        })
+        });
+    }
+
+    const goalBttn = document.getElementById("goalBttn");
+    if(goalBttn){
+        goalBttn.addEventListener("click", () => {
+            sessionStorage.setItem("userId", userId);
+            window.location.href = '../mainPage/goalPage.html';
+        });
     }
 });

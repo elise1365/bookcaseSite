@@ -109,3 +109,8 @@ button {
 input {
     border-radius: 15px;
 }
+
+#goalBttn {
+    color: white;
+    cursor: pointer;
+}
