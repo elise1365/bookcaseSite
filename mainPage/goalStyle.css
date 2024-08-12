@@ -37,3 +37,18 @@ i {
     font-weight: 700;
     font-size: 25px;
 }
+
+#saveBttn{
+    bottom: 20px;
+    right: 20px;
+    position: absolute;
+    padding: 10px;
+}
+
+p {
+    font-size: 17px;
+}
+
+p {
+    padding: 0 0 0 5px;
+}
