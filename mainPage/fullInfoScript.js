@@ -222,9 +222,7 @@ function convertTextAreaToP(){
 
 async function updateElement(item, value){
     const db = initApp();
-    // alert(userId);
     const bookInfo = collection(db, "books");
-    // alert(title);
     const q = query(bookInfo, where("title", "==", title));
     const querySnapshot = await getDocs(q);
 

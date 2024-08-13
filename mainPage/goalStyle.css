@@ -47,8 +47,11 @@ i {
 
 p {
     font-size: 17px;
+    padding: 0 0 0 5px;
 }
 
-p {
-    padding: 0 0 0 5px;
+input {
+    width: 50px;
+    font-size: 17px;
+    height: 25px;
 }

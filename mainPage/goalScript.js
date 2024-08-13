@@ -1,5 +1,8 @@
 "use strict"
 
+// ToDo: add new reading goal option if reading goal is not already established
+// ToDo: view previous goals (if any are available)
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { collection, query, where, getFirestore, doc, getDocs, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
@@ -59,7 +62,7 @@ async function displayAllInfo(){
     // add stats
     // percentage complete
     let percentageElement = document.getElementById("percentage");
-    let percentageCompleted = goal / booksRead;
+    let percentageCompleted = (booksRead / goal) * 100;
     percentageCompleted = Math.floor(percentageCompleted);
     percentageElement.innerHTML = "- " + percentageCompleted + "% complete"
 
@@ -94,7 +97,11 @@ async function displayAllInfo(){
 
                 let onTrack;
 
-                if(expected >= goal){
+                if(booksRead >= goal){
+                    onTrack = "You have achieved your reading goal!";
+                    // ToDo: add some sort of celebration thing here
+                }
+                else if(booksRead >= expected){
                     onTrack = "You are on track to achieve your goal";
                 }
                 else{
@@ -114,7 +121,28 @@ async function displayAllInfo(){
 
     // how often user needs to finish a book to achieve goal
     let planElement = document.getElementById("plan");
+    // ToDo: if number of books to read is 1 then it should be book rather than books
     planElement.innerHTML = "In order to reach your goal, you need to read " + Math.ceil(booksPerMonth) + " books per month - ";
+}
+
+async function updateGoal(newGoal){
+    const db = initApp();
+    const goalCollection = collection(db, "readingGoals");
+    const q = query(goalCollection, where("userID", "==", userID));
+    const snapshot = await getDocs(q);
+
+    if(!snapshot.empty){
+        snapshot.forEach(async (doc) => {
+            try {
+                await updateDoc(doc.ref, {
+                    ["goal"]: newGoal
+                });
+                console.log("Document updated successfully");
+            } catch (error) {
+                console.log("Error updating document: ", error);
+            }
+        })
+    }
 }
 
 function editMode(){
@@ -124,15 +152,42 @@ function editMode(){
     editBttn.id = "saveBttn";
     editBttn.removeEventListener("click", editMode);
     editBttn.addEventListener("click", saveChanges);
+
+    // get all the stats info and wipe it clean - no need for it in edit mode
+    let percentageElement = document.getElementById("percentage");
+    percentageElement.innerHTML = "";
+
+    let planElement = document.getElementById("plan");
+    planElement.innerHTML = "";
+
+    let trackElement = document.getElementById("track");
+    trackElement.innerHTML = "";
+
+    // convert goal element to input
+    let goalElement = document.getElementById("goal");
+    goalElement.innerHTML = booksRead + " / ";
+    let newElement = document.createElement("input");
+    newElement.id = "goalId";
+    newElement.type = "number";
+    newElement.value = goal;
+    goalElement.appendChild(newElement);
 }
 
-function saveChanges(){
+async function saveChanges(){
     // convert save bttn back to edit bttn
     let saveBttn = document.getElementById("saveBttn");
     saveBttn.innerHTML = "edit";
     saveBttn.id = "editBttn";
     saveBttn.removeEventListener("click", saveChanges);
     saveBttn.addEventListener("click", editMode);
+
+    // update goal
+    let goalInputElement = document.getElementById("goalId");
+    let newGoal = goalInputElement.value;
+    await updateGoal(newGoal);
+    goal = newGoal;
+
+    await getInfoFromDb();
 }
 
 window.onload = getInfoFromDb();
