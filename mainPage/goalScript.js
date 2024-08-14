@@ -1,15 +1,15 @@
 "use strict"
 
-// ToDo: add new reading goal option if reading goal is not already established
 // ToDo: view previous goals (if any are available)
 // ToDo: add console.log() stuff at important points!
 // ToDo: whenever a book is added, update booksRead
+// ToDo: save button only converts back to save bttn if update goes well
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { collection, query, where, getFirestore, doc, getDocs, getDoc, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 let year;
-let goal;
+let goal = 0;
 let booksRead = 0;
 let userID = sessionStorage.getItem("userId");
 
@@ -66,6 +66,7 @@ async function getInfoFromDb(){
         let goalInputElement = document.createElement("input");
         goalInputElement.type = "number";
         goalInputElement.id = "chosenGoal";
+        goalInputElement.value = 1;
         goalElement.appendChild(goalInputElement);
 
         // convert edit bttn to save bttn
@@ -78,47 +79,54 @@ async function getInfoFromDb(){
 }
 
 async function createNewGoal(){
-    // change bttn back to edit, and add normal event listeners e.g., save mode and edit mode
-    let saveBttn = document.getElementById("saveBttn");
-    saveBttn.innerHTML = "edit";
-    saveBttn.id = "editBttn";
-    saveBttn.removeEventListener("click", createNewGoal);
-    saveBttn.addEventListener("click", editMode);
-
     // get all info to write a new doc into the db
-    let yearInput = document.getElementById("yearInput");
-    year = yearInput.value;
     let goalInput = document.getElementById("chosenGoal");
     goal = goalInput.value;
+    let yearInput = document.getElementById("yearInput");
+    year = yearInput.value;
 
-    // calculate how many books read
-    const db = initApp();
-    const goalCollection = collection(db, "books");
-    const q = query(goalCollection, where("userID", "==", userID));
-    const snapshot = await getDocs(q);
+    if(Number.isInteger(Number(year)) && year > 0){
+        // calculate how many books read
+        const db = initApp();
+        const goalCollection = collection(db, "books");
+        const q = query(goalCollection, where("userID", "==", userID));
+        const snapshot = await getDocs(q);
 
-    if(!snapshot.empty){
-        snapshot.forEach((doc) => {
-            let bookData = doc.data();
-            let date = bookData.dateFinished;
-            let yearFinished = date[0] + date[1] + date[2] + date[3];
-            if(yearFinished == year){
-                booksRead += 1;
-            }
-        })
+        if(!snapshot.empty){
+            snapshot.forEach((doc) => {
+                let bookData = doc.data();
+                let date = bookData.dateFinished;
+                let yearFinished = date[0] + date[1] + date[2] + date[3];
+                if(yearFinished == year){
+                    booksRead += 1;
+                }
+            });
+        } else{
+            console.log("no books for this user")
+        }
+        // acces db and write new doc
+        let docRef = await addDoc(collection(db, "readingGoals"), {
+            booksRead: booksRead,
+            goal: goal,
+            userID: userID,
+            year: year
+        });
+
+        alert(docRef);
+
+        // change bttn back to edit, and add normal event listeners e.g., save mode and edit mode
+        let saveBttn = document.getElementById("saveBttn");
+        saveBttn.innerHTML = "edit";
+        saveBttn.id = "editBttn";
+        saveBttn.removeEventListener("click", createNewGoal);
+        saveBttn.addEventListener("click", editMode);
+
+        // ToDo: detect if doc hasnt been created & error stuff
+        getInfoFromDb();
+    } else {
+        console.log("user did not enter a valid year");
+        showErrorMessage("Please enter valid year e.g., 2024");
     }
-    // ToDo: add error stuff e.g., if user doesnt enter a goal or year or whatever
-
-    // acces db and write new doc
-    let docRef = await addDoc(collection(db, "readingGoals"), {
-        booksRead: booksRead,
-        goal: goal,
-        userID: userID,
-        year: year
-    })
-    // ToDo: detect if doc hasnt been created & error stuff
-
-    getInfoFromDb();
 }
 
 async function displayAllInfo(){
@@ -260,6 +268,20 @@ async function saveChanges(){
 
     await getInfoFromDb();
 }
+
+function showErrorMessage(errorText){
+    let errorBanner = document.getElementById("errorBanner");
+    let errorMessageText = document.getElementById("errorText");
+    let closeButton = document.getElementById("closeButton");
+  
+    errorMessageText.textContent = errorText;
+    errorBanner.classList.remove("hidden");
+  
+    closeButton.addEventListener('click', () => {
+      errorBanner.classList.add('hidden');
+      errorMessageText.textContent = "";
+    });
+  };
 
 window.onload = getInfoFromDb();
 
