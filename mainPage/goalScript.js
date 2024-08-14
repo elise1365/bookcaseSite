@@ -2,13 +2,15 @@
 
 // ToDo: add new reading goal option if reading goal is not already established
 // ToDo: view previous goals (if any are available)
+// ToDo: add console.log() stuff at important points!
+// ToDo: whenever a book is added, update booksRead
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { collection, query, where, getFirestore, doc, getDocs, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { collection, query, where, getFirestore, doc, getDocs, getDoc, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 let year;
 let goal;
-let booksRead;
+let booksRead = 0;
 let userID = sessionStorage.getItem("userId");
 
 function initApp(){
@@ -36,6 +38,7 @@ async function getInfoFromDb(){
     const snapshot = await getDocs(q);
 
     if(!snapshot.empty){
+        console.log("goal exists");
         snapshot.forEach((doc) => {
             const allData = doc.data();
             year = allData.year;
@@ -46,8 +49,76 @@ async function getInfoFromDb(){
     }
     else{
         console.log("goal doesnt exist");
-        // ToDo: error stuff etc etc
+        // if goal doesnt exist than introduce an option to make one
+
+        // make title into input
+        let titleElement = document.getElementById("title");
+        titleElement.innerHTML = "";
+        let newElement = document.createElement("input");
+        newElement.id = "yearInput";
+        newElement.type = "text";
+        newElement.value = "Insert year here";
+        titleElement.appendChild(newElement);
+
+        // input for goal
+        let goalElement = document.getElementById("goal");
+        goalElement.innerHTML = "How many books do you want to read this year? ";
+        let goalInputElement = document.createElement("input");
+        goalInputElement.type = "number";
+        goalInputElement.id = "chosenGoal";
+        goalElement.appendChild(goalInputElement);
+
+        // convert edit bttn to save bttn
+        let editBttn = document.getElementById("editBttn");
+        editBttn.innerHTML = "check";
+        editBttn.id = "saveBttn";
+        editBttn.removeEventListener("click", editMode);
+        editBttn.addEventListener("click", createNewGoal);
     }
+}
+
+async function createNewGoal(){
+    // change bttn back to edit, and add normal event listeners e.g., save mode and edit mode
+    let saveBttn = document.getElementById("saveBttn");
+    saveBttn.innerHTML = "edit";
+    saveBttn.id = "editBttn";
+    saveBttn.removeEventListener("click", createNewGoal);
+    saveBttn.addEventListener("click", editMode);
+
+    // get all info to write a new doc into the db
+    let yearInput = document.getElementById("yearInput");
+    year = yearInput.value;
+    let goalInput = document.getElementById("chosenGoal");
+    goal = goalInput.value;
+
+    // calculate how many books read
+    const db = initApp();
+    const goalCollection = collection(db, "books");
+    const q = query(goalCollection, where("userID", "==", userID));
+    const snapshot = await getDocs(q);
+
+    if(!snapshot.empty){
+        snapshot.forEach((doc) => {
+            let bookData = doc.data();
+            let date = bookData.dateFinished;
+            let yearFinished = date[0] + date[1] + date[2] + date[3];
+            if(yearFinished == year){
+                booksRead += 1;
+            }
+        })
+    }
+    // ToDo: add error stuff e.g., if user doesnt enter a goal or year or whatever
+
+    // acces db and write new doc
+    let docRef = await addDoc(collection(db, "readingGoals"), {
+        booksRead: booksRead,
+        goal: goal,
+        userID: userID,
+        year: year
+    })
+    // ToDo: detect if doc hasnt been created & error stuff
+
+    getInfoFromDb();
 }
 
 async function displayAllInfo(){
