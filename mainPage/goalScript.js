@@ -163,9 +163,6 @@ async function displayAllInfo(){
     // on track / behind / ahead
     let booksPerMonth = goal / 12;
 
-    // ToDo: what if 2 books r finished on the same day?
-    // ToDo: make sure most recent book is from that correct year
-
     const db = initApp();    
     const goalCollection = collection(db, "books");
     const q = query(goalCollection, where("userID", "==", userID));
@@ -193,7 +190,6 @@ async function displayAllInfo(){
 
                 if(booksRead >= goal){
                     onTrack = "You have achieved your reading goal!";
-                    // ToDo: add some sort of celebration thing here
                 }
                 else if(booksRead >= expected){
                     onTrack = "You are on track to achieve your goal";
@@ -213,8 +209,12 @@ async function displayAllInfo(){
 
     // how often user needs to finish a book to achieve goal
     let planElement = document.getElementById("plan");
-    // ToDo: if number of books to read is 1 then it should be book rather than books
-    planElement.innerHTML = "In order to reach your goal, you need to read " + Math.ceil(booksPerMonth) + " books per month - ";
+    let roundedBooksPerMonth = Math.ceil(booksPerMonth);
+    if(roundedBooksPerMonth == 1){
+        planElement.innerHTML = "In order to reach your goal, you need to read 1 book every month - ";
+    } else {
+        planElement.innerHTML = "In order to reach your goal, you need to read " + roundedBooksPerMonth + " books per month - ";
+    }
 }
 
 async function updateGoal(newGoal){
