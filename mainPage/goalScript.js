@@ -1,10 +1,5 @@
 "use strict"
 
-// ToDo: view previous goals (if any are available)
-// ToDo: add console.log() stuff at important points!
-// ToDo: whenever a book is added, update booksRead
-// ToDo: save button only converts back to save bttn if update goes well
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { collection, query, where, getFirestore, doc, getDocs, getDoc, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
@@ -12,6 +7,9 @@ let year;
 let goal = 0;
 let booksRead = 0;
 let userID = sessionStorage.getItem("userId");
+
+let currentDate = new Date();
+let currentYear = currentDate.getFullYear();
 
 function initApp(){
     // Your web app's Firebase configuration
@@ -38,94 +36,111 @@ async function getInfoFromDb(){
     const snapshot = await getDocs(q);
 
     if(!snapshot.empty){
-        console.log("goal exists");
-        snapshot.forEach((doc) => {
+        console.log("goals exist");
+        snapshot.forEach(async (doc) => {
             const allData = doc.data();
             year = allData.year;
-            goal = allData.goal;
-            booksRead = allData.booksRead;
-            displayAllInfo();
+            if(year == currentYear){
+                console.log("goal exists for current year");
+                goal = allData.goal;
+                booksRead = await calculateBooksRead();
+                displayAllInfo();
+            }
+            else{
+                console.log("goal doesn't exist for current year");
+                setUpNewGoalInputs();
+            }
         })
     }
     else{
-        console.log("goal doesnt exist");
-        // if goal doesnt exist than introduce an option to make one
-
-        // make title into input
-        let titleElement = document.getElementById("title");
-        titleElement.innerHTML = "";
-        let newElement = document.createElement("input");
-        newElement.id = "yearInput";
-        newElement.type = "text";
-        newElement.value = "Insert year here";
-        titleElement.appendChild(newElement);
-
-        // input for goal
-        let goalElement = document.getElementById("goal");
-        goalElement.innerHTML = "How many books do you want to read this year? ";
-        let goalInputElement = document.createElement("input");
-        goalInputElement.type = "number";
-        goalInputElement.id = "chosenGoal";
-        goalInputElement.value = 1;
-        goalElement.appendChild(goalInputElement);
-
-        // convert edit bttn to save bttn
-        let editBttn = document.getElementById("editBttn");
-        editBttn.innerHTML = "check";
-        editBttn.id = "saveBttn";
-        editBttn.removeEventListener("click", editMode);
-        editBttn.addEventListener("click", createNewGoal);
+        console.log("no goals exist for current user");
+        setUpNewGoalInputs();
     }
+}
+
+async function calculateBooksRead(){
+    const db = initApp();
+    const goalCollection = collection(db, "books");
+    const q = query(goalCollection, where("userID", "==", userID));
+    const snapshot = await getDocs(q);
+
+    let booksFinished = 0;
+
+    if(!snapshot.empty){
+        snapshot.forEach((doc) => {
+            const bookData = doc.data();
+            let bookYear = bookData.dateFinished[0] + bookData.dateFinished[1] + bookData.dateFinished[2] + bookData.dateFinished[3]
+            if(bookYear == currentYear){
+                console.log("book added to booksRead")
+                booksFinished += 1;
+            } else{
+                console.log("book was not finished in the current year")
+            }
+        })
+    } else{
+        console.log("no books logged for this user");
+    }
+
+    return booksFinished;
+}
+
+function setUpNewGoalInputs(){
+    // if goal doesnt exist than introduce an option to make one
+    let titleElement = document.getElementById("title");
+    titleElement.innerHTML = currentYear + " Reading Goal";
+
+    // input for goal
+    let goalElement = document.getElementById("goal");
+    goalElement.innerHTML = "How many books do you want to read this year? ";
+    let goalInputElement = document.createElement("input");
+    goalInputElement.type = "number";
+    goalInputElement.id = "chosenGoal";
+    goalInputElement.value = 1;
+    goalElement.appendChild(goalInputElement);
+
+    // convert edit bttn to save bttn
+    let editBttn = document.getElementById("editBttn");
+    editBttn.innerHTML = "check";
+    editBttn.id = "saveBttn";
+    editBttn.removeEventListener("click", editMode);
+    editBttn.addEventListener("click", createNewGoal);
 }
 
 async function createNewGoal(){
     // get all info to write a new doc into the db
     let goalInput = document.getElementById("chosenGoal");
     goal = goalInput.value;
-    let yearInput = document.getElementById("yearInput");
-    year = yearInput.value;
 
-    if(Number.isInteger(Number(year)) && year > 0){
-        // calculate how many books read
-        const db = initApp();
-        const goalCollection = collection(db, "books");
-        const q = query(goalCollection, where("userID", "==", userID));
-        const snapshot = await getDocs(q);
+    // calculate how many books read
+    booksRead = await calculateBooksRead();
 
-        if(!snapshot.empty){
-            snapshot.forEach((doc) => {
-                let bookData = doc.data();
-                let date = bookData.dateFinished;
-                let yearFinished = date[0] + date[1] + date[2] + date[3];
-                if(yearFinished == year){
-                    booksRead += 1;
-                }
-            });
-        } else{
-            console.log("no books for this user")
-        }
-        // acces db and write new doc
-        let docRef = await addDoc(collection(db, "readingGoals"), {
-            booksRead: booksRead,
-            goal: goal,
-            userID: userID,
-            year: year
-        });
-
-        alert(docRef);
-
+    // acces db and write new doc
+    const db = initApp();
+    let docRef = await addDoc(collection(db, "readingGoals"), {
+        booksRead: booksRead,
+        goal: goal,
+        userID: userID,
+        year: currentYear
+    });
+    
+    // if creating new goal doesnt work which shouldnt happen but just in case!
+    if(docRef.empty){
+        console.log("goal not created");
+        showErrorMessage("Reading goal creation unsuccessful, please try again");
+    } else {
+        console.log("goal successfully created");
         // change bttn back to edit, and add normal event listeners e.g., save mode and edit mode
         let saveBttn = document.getElementById("saveBttn");
         saveBttn.innerHTML = "edit";
         saveBttn.id = "editBttn";
         saveBttn.removeEventListener("click", createNewGoal);
         saveBttn.addEventListener("click", editMode);
-
-        // ToDo: detect if doc hasnt been created & error stuff
+    
+        // remove error message if it hasnt been removed already (precautionary)
+        let errorBanner = document.getElementById("errorBanner");
+        errorBanner.classList.add('hidden');
+    
         getInfoFromDb();
-    } else {
-        console.log("user did not enter a valid year");
-        showErrorMessage("Please enter valid year e.g., 2024");
     }
 }
 
@@ -165,7 +180,7 @@ async function displayAllInfo(){
             const bookData = doc.data();
             const bookDate = new Date(bookData.dateFinished);
 
-            if(!mostRecentDate || bookDate > mostRecentDate){
+            if(bookDate.getFullYear() === currentYear && (!mostRecentDate || bookDate > mostRecentDate)){
                 mostRecentDate = bookDate;
                 mostRecentBookID = doc.id;
                 date = bookData.dateFinished;
@@ -193,9 +208,7 @@ async function displayAllInfo(){
         }
     );
     } else{
-        // ToDo: error stuff!
-        console.log("no book found for this user")
-        return null;
+        console.log("no books found for this user");
     }
 
     // how often user needs to finish a book to achieve goal

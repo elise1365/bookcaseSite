@@ -105,3 +105,12 @@ input[type="text"] {
     right: 10px;
     bottom: 13px;
 }
+
+#addBttn{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute; 
+    right: 30px;
+    top: 30px;
+}
