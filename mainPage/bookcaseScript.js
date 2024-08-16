@@ -1,7 +1,7 @@
 "use strict";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { collection, query, where, getFirestore, doc, getDocs, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { collection, query, where, getFirestore, doc, getDocs, getDoc, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
 // ToDo: reading goal for the year
@@ -165,8 +165,23 @@ async function getBookTitlesMap() {
         })
     }
     else{
-        // ToDo: add error stuff here
-        alert("nuh uh!");
+        console.log("no bookcase exists for user");
+        // set username as user
+        username = "user";
+
+        // create bookcase for user
+        let docRef = await addDoc(collection(db, "bookcases"), {
+            listOfBookIds: [],
+            name: username,
+            userID: userId
+        });
+
+        if(docRef.empty){
+            console.log("documenet creation unsuccessful, please try again");
+        } else{
+            console.log("bookcase creation successful");
+            getName();
+        }
     }
 }
 

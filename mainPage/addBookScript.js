@@ -97,6 +97,7 @@ async function addBookToDb(){
 
     // get list from users collection in db
     if (!querySnapshot.empty){
+        console.log("bookcase exists for user");
         querySnapshot.forEach((doc) => {
             const bookcaseData = doc.data();
             listOfBookIds = bookcaseData.listOfBookIds;
@@ -104,8 +105,7 @@ async function addBookToDb(){
         })
     }
     else{
-        // ToDo: add error stuff here
-        alert("nuh uh!");
+        console.log("no bookcases available");
     }
 
     listOfBookIds.push(bookId);
