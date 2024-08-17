@@ -1,7 +1,9 @@
 "use strict";
 
+// ToDo: delete book option
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getDoc, getFirestore, doc, updateDoc, getDocs, query, collection, where } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { getDoc, getFirestore, doc, updateDoc, getDocs, query, collection, where, deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 let bookId = sessionStorage.getItem("bookId");
 let title;
@@ -223,7 +225,7 @@ function convertTextAreaToP(){
 async function updateElement(item, value){
     const db = initApp();
     const bookInfo = collection(db, "books");
-    const q = query(bookInfo, where("title", "==", title));
+    const q = query(bookInfo, where("userID", "==", userId), where("title", "==", title));
     const querySnapshot = await getDocs(q);
 
     if (!querySnapshot.empty){
@@ -302,6 +304,55 @@ function editMode(){
     createEditableStars();
 }
 
+async function deleteEntry(){
+    const db = initApp();
+    const bookInfo = collection(db, "books");
+    const q = query(bookInfo, where("userID", "==", userId), where("title", "==", title));
+    const snapshot = await getDocs(q);
+
+    // get doc id from db
+    let docId;
+
+    if(!snapshot.empty){
+        snapshot.forEach((doc) => {
+            docId = doc.id;
+        })
+    }
+
+    // delete item from db
+    deleteDoc(doc(db, "books", docId));
+
+    // delete item from listOfBooksIds
+    const bookcaseInfo = collection(db, "bookcases");
+    const bookscaseQ = query(bookcaseInfo, where("userID", "==", userId));
+    const bookscaseSnapshot = await getDocs(bookscaseQ);
+
+    // get list of bookIds
+    let listOfBookIds;
+
+    if(!bookscaseSnapshot.empty){
+        bookscaseSnapshot.forEach(async (doc) => {
+            const allData = doc.data();
+            listOfBookIds = allData.listOfBookIds;
+            // remove item thats just been deleted from list
+            listOfBookIds = listOfBookIds.filter(id => id !== docId);
+            // update bookcase with new listOfBookIds
+            try {
+                await updateDoc(doc.ref, {
+                    ["listOfBookIds"]: listOfBookIds
+                });
+                console.log("Document updated successfully");
+            } catch (error) {
+                console.log("Error updating document: ", error);
+            }
+        })
+    }
+    else {
+        console.log("no document exists");
+    }
+    // ToDo: error stuff!!!
+}
+
 // function loading stuff
 window.onload = function() {
     getBookInfo();
@@ -327,5 +378,12 @@ document.addEventListener("DOMContentLoaded", () => {
         saveButton.addEventListener("click", () => {
             saveChanges();
         });
+    }
+
+    const deleteBttn = document.getElementById("deleteBttn");
+    if(deleteBttn){
+        deleteBttn.addEventListener("click", () => {
+            deleteEntry();
+        })
     }
 })

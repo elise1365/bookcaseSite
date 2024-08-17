@@ -12,20 +12,20 @@ let review;
 
 function initApp(){
     // Your web app's Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyBJ2lJaYojtl0Gqi6C2yQyA-X_O-PbIBYU",
-    authDomain: "bookcasesite-f9ce9.firebaseapp.com",
-    projectId: "bookcasesite-f9ce9",
-    storageBucket: "bookcasesite-f9ce9.appspot.com",
-    messagingSenderId: "1028674706274",
-    appId: "1:1028674706274:web:c9f2f9be0fbaefb94fea3b",
-    measurementId: "G-J7K3W3C2PT"
-  };
+    const firebaseConfig = {
+        apiKey: "AIzaSyBJ2lJaYojtl0Gqi6C2yQyA-X_O-PbIBYU",
+        authDomain: "bookcasesite-f9ce9.firebaseapp.com",
+        projectId: "bookcasesite-f9ce9",
+        storageBucket: "bookcasesite-f9ce9.appspot.com",
+        messagingSenderId: "1028674706274",
+        appId: "1:1028674706274:web:c9f2f9be0fbaefb94fea3b",
+        measurementId: "G-J7K3W3C2PT"
+    };
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  return db;
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    return db;
 };
 
 function createEditableStars(){
@@ -86,10 +86,12 @@ async function addBookToDb(){
     })
 
     // now need to update the users bookcase with this new book, first get list of bookIds, then add new book onto the end
+    // also get username
     let bookId = docRef.id;
 
     let listOfBookIds;
     let docId;
+    let username;
 
     const bookCasesCollection = collection(db, "bookcases");
     const q = query(bookCasesCollection, where("userID", "==", userId));
@@ -100,6 +102,7 @@ async function addBookToDb(){
         console.log("bookcase exists for user");
         querySnapshot.forEach((doc) => {
             const bookcaseData = doc.data();
+            username = bookcaseData.name;
             listOfBookIds = bookcaseData.listOfBookIds;
             docId = doc.id;
         })
@@ -111,6 +114,7 @@ async function addBookToDb(){
     listOfBookIds.push(bookId);
 
     setDoc(doc(db, "bookcases", docId), {
+        name: username,
         listOfBookIds: listOfBookIds,
         userID: userId
     })
