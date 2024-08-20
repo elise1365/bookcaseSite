@@ -294,7 +294,7 @@ function showErrorMessage(errorText){
       errorBanner.classList.add('hidden');
       errorMessageText.textContent = "";
     });
-  };
+};
 
 window.onload = getInfoFromDb();
 

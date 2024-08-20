@@ -1,12 +1,11 @@
 "use strict";
 
-// ToDo: delete book option
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getDoc, getFirestore, doc, updateDoc, getDocs, query, collection, where, deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 let bookId = sessionStorage.getItem("bookId");
 let title;
+let author;
 let dateFinished;
 let dateStarted;
 let stars;
@@ -39,25 +38,32 @@ async function getBookInfo(){
     if (docSnap.exists()){
         const bookData = docSnap.data();
         title = await bookData.title;
+        author = await bookData.author;
         review = await bookData.review;
         stars = await bookData.stars;
         dateStarted = await bookData.dateStarted;
         dateFinished = await bookData.dateFinished;
 
         addTitle();
+        addAuthor();
         addStars();
         addReview();
         addDates();
     }
     else{
         console.log("book doesnt exist");
-        // ToDo: error stuff
     }
 }
 
 function addTitle() {
     let titleElement = document.getElementById("title");
     titleElement.innerText = title;
+}
+
+// added author later on so some books dont have an author, but when edit mode is called users can add one
+function addAuthor(){
+    let authorElement = document.getElementById("author");
+    authorElement.innerText = author;
 }
 
 function addStars() {
@@ -101,6 +107,10 @@ function addDates() {
 
 function convertToDate(dateAsNum){
     let date;
+
+    if(dateAsNum == "0000-00-00"){
+        date = "unspecified";
+    } else {
         // day
         if (dateAsNum[8] == 0){
             date = dateAsNum[9];
@@ -108,8 +118,8 @@ function convertToDate(dateAsNum){
         else {
             date = dateAsNum[8] + dateAsNum[9];
         }
-    
-        if (dateAsNum[9] == 0 || dateAsNum[9] == 2 || dateAsNum[9] == 3){
+        
+        if (dateAsNum[9] == 1 || dateAsNum[9] == 2 || dateAsNum[9] == 3){
             if(dateAsNum[9] == 1){
                 date += "st"
             }
@@ -124,19 +134,20 @@ function convertToDate(dateAsNum){
             date += "th";
         }
 
-    // month
-    let month = dateAsNum[5].toString() + dateAsNum[6].toString();
-    month = parseInt(month);
-    let monthsList = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    let monthName = monthsList[month-1];
+        // month
+        let month = dateAsNum[5].toString() + dateAsNum[6].toString();
+        month = parseInt(month);
+        let monthsList = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        let monthName = monthsList[month-1];
 
-    // year
-    let year = dateAsNum[0].toString() + dateAsNum[1].toString() + dateAsNum[2].toString() + dateAsNum[3].toString();
+        // year
+        let year = dateAsNum[0].toString() + dateAsNum[1].toString() + dateAsNum[2].toString() + dateAsNum[3].toString();
 
-    date += " of ";
-    date += monthName;
-    date += " ";
-    date += year;
+        date += " of ";
+        date += monthName;
+        date += " ";
+        date += year;
+    }
 
     return date;
 }
@@ -149,7 +160,11 @@ function changeElementToInput(id, inputType){
 
     if(inputType == "date"){
         if(id == "dateStarted"){
-            newElement.value = dateStarted;
+            if(dateStarted == "0000-00-00"){
+                newElement.value = "2000-01-01";
+            } else {
+                newElement.value = dateStarted;
+            }
         }
         else{
             newElement.value = dateFinished;
@@ -240,43 +255,52 @@ async function updateElement(item, value){
             }
         });
     } else{
-        // ToDo: add error stuff here
         console.log("document not found");
     }
 }
 
+
 function saveChanges(){
-    // change the button from edit to save
-    let editBttn = document.getElementById("saveBttnIcon")
-    editBttn.innerText = "edit";
-    editBttn.id = "editBttnIcon";
-    editBttn.removeEventListener("click", saveChanges);
-    editBttn.addEventListener("click", editMode);
+    let titleElementInput = document.getElementById("title")
+    if(titleElementInput.value == ""){
+        showErrorMessage("Please enter a title and try again");
+    } else {
+        // change the button from edit to save
+        let editBttn = document.getElementById("saveBttnIcon")
+        editBttn.innerText = "edit";
+        editBttn.id = "editBttnIcon";
+        editBttn.removeEventListener("click", saveChanges);
+        editBttn.addEventListener("click", editMode);
 
-    changeInputToElement("title");
-    convertTextAreaToP();
-    changeInputToElement("dateFinished");
-    changeInputToElement("dateStarted");
+        changeInputToElement("title");
+        changeInputToElement("author");
+        convertTextAreaToP();
+        changeInputToElement("dateFinished");
+        changeInputToElement("dateStarted");
 
-    // rewrite each element into the db, regardless of whether its changed
-    let titleElement = document.getElementById("title");
-    updateElement("title", titleElement.innerText);
+        // rewrite each element into the db, regardless of whether its changed
+        let titleElement = document.getElementById("title");
+        updateElement("title", titleElement.innerText);
 
-    let reviewElement = document.getElementById("review");
-    updateElement("review", reviewElement.innertext);
-    review = reviewElement.innertext;
-    addReview();
+        let authorElement = document.getElementById("author");
+        updateElement("author", authorElement.innerText);
 
-    let dateFinishedElement = document.getElementById("dateFinished");
-    updateElement("dateFinished", dateFinishedElement.innerHTML);
-    let dateStartedElement = document.getElementById("dateStarted");
-    updateElement("dateStarted", dateStartedElement.innerHTML);
-    dateStarted = dateStartedElement.innerHTML;
-    dateFinished = dateFinishedElement.innerHTML;
-    addDates();
+        let reviewElement = document.getElementById("review");
+        updateElement("review", reviewElement.innertext);
+        review = reviewElement.innertext;
+        addReview();
 
-    updateElement("stars", stars);
-    addStars();
+        let dateFinishedElement = document.getElementById("dateFinished");
+        updateElement("dateFinished", dateFinishedElement.innerHTML);
+        let dateStartedElement = document.getElementById("dateStarted");
+        updateElement("dateStarted", dateStartedElement.innerHTML);
+        dateStarted = dateStartedElement.innerHTML;
+        dateFinished = dateFinishedElement.innerHTML;
+        addDates();
+
+        updateElement("stars", stars);
+        addStars();
+    }
 }
 
 function editMode(){
@@ -295,7 +319,7 @@ function editMode(){
 
     // get each item from the page and convert to an input box for editing
     changeElementToInput("title", "text");
-    // changeElementToInput("review", "text");
+    changeElementToInput("author", "text");
     changeReviewToTextArea();
     changeElementToInput("dateFinished", "date");
     changeElementToInput("dateStarted", "date");
@@ -314,46 +338,61 @@ async function deleteEntry(){
     let docId;
 
     if(!snapshot.empty){
+        console.log("book exists in db");
         snapshot.forEach((doc) => {
             docId = doc.id;
-        })
+        });
+        // delete item from db
+        deleteDoc(doc(db, "books", docId));
+
+        // delete item from listOfBooksIds
+        const bookcaseInfo = collection(db, "bookcases");
+        const bookscaseQ = query(bookcaseInfo, where("userID", "==", userId));
+        const bookscaseSnapshot = await getDocs(bookscaseQ);
+
+        // get list of bookIds
+        let listOfBookIds;
+
+        if(!bookscaseSnapshot.empty){
+            bookscaseSnapshot.forEach(async (doc) => {
+                const allData = doc.data();
+                listOfBookIds = allData.listOfBookIds;
+                // remove item thats just been deleted from list
+                listOfBookIds = listOfBookIds.filter(id => id !== docId);
+                // update bookcase with new listOfBookIds
+                try {
+                    await updateDoc(doc.ref, {
+                        ["listOfBookIds"]: listOfBookIds
+                    });
+                    console.log("Document updated successfully");
+                    window.location.href = '../mainPage/bookcase.html';
+                } catch (error) {
+                    console.log("Error updating document: ", error);
+                }
+            });
+        }
+        else {
+            console.log("no document exists");
+        }
+    } else {
+        console.log("book does not exist in db for user");
     }
-
-    // delete item from db
-    deleteDoc(doc(db, "books", docId));
-
-    // delete item from listOfBooksIds
-    const bookcaseInfo = collection(db, "bookcases");
-    const bookscaseQ = query(bookcaseInfo, where("userID", "==", userId));
-    const bookscaseSnapshot = await getDocs(bookscaseQ);
-
-    // get list of bookIds
-    let listOfBookIds;
-
-    if(!bookscaseSnapshot.empty){
-        bookscaseSnapshot.forEach(async (doc) => {
-            const allData = doc.data();
-            listOfBookIds = allData.listOfBookIds;
-            // remove item thats just been deleted from list
-            listOfBookIds = listOfBookIds.filter(id => id !== docId);
-            // update bookcase with new listOfBookIds
-            try {
-                await updateDoc(doc.ref, {
-                    ["listOfBookIds"]: listOfBookIds
-                });
-                console.log("Document updated successfully");
-            } catch (error) {
-                console.log("Error updating document: ", error);
-            }
-        })
-    }
-    else {
-        console.log("no document exists");
-    }
-    // ToDo: error stuff!!!
 }
 
-// function loading stuff
+function showErrorMessage(errorText){
+    let errorBanner = document.getElementById("errorBanner");
+    let errorMessageText = document.getElementById("errorText");
+    let closeButton = document.getElementById("closeButton");
+  
+    errorMessageText.textContent = errorText;
+    errorBanner.classList.remove("hidden");
+  
+    closeButton.addEventListener('click', () => {
+      errorBanner.classList.add('hidden');
+      errorMessageText.textContent = "";
+    });
+};
+
 window.onload = function() {
     getBookInfo();
 };

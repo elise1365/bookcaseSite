@@ -27,13 +27,19 @@ button {
     padding: 20px;
 }
 
-#title {
+#titleContainer {
     font-weight: 700;
     font-size: 25px;
+    display: flex;
+}
+
+#titleContainer p {
+    padding: 5px;
 }
 
 .oneLine {
     display: flex;
+    padding: 5px;
 }
 
 .filledStar {
@@ -74,4 +80,55 @@ i {
     bottom: 25px;
     left: 20px;
     position: absolute;
+}
+
+#errorBanner {
+    background-color: #D52941;
+    border: 1.9px solid black;
+    padding: 10px;
+    border-radius: 15px;
+    width: 270px;
+    height: 30px;
+    /* display: flex; */
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.hidden {
+    display: none;
+}
+
+#closeIcon {
+    background-color: #D52941;
+}
+
+#closeButton {
+    background-color: #D52941;
+    border: none;
+    height: 10px;
+    width: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute; 
+    left: 10px;
+    bottom: 2px;
+}
+
+#errorText {
+    font-size: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute; 
+    right: 10px;
+    bottom: 13px;
+}
+
+input[type="text"]{
+    font-size: 20px;
+    height: 50px;
+    width: 150px;
+    padding: 5px;
 }

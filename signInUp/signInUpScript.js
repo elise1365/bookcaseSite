@@ -35,7 +35,6 @@ async function logIn() {
       sessionStorage.setItem("userId", userId);
       window.location.href = '../mainPage/bookcase.html';
 
-      // alert(userId);
   } catch (error) {
     let errorMessage = error.code;
     errorMessage = errorMessage.substring(5);
@@ -75,12 +74,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const loginButton = document.getElementById("loginBttn");
   if (loginButton) {
       loginButton.addEventListener("click", logIn);
-      console.log("Login button listener added");
   }
 
   const signUpButton = document.getElementById("signUpBttn");
   if (signUpButton) {
       signUpButton.addEventListener("click", signUp);
-      console.log("Sign up button listener added");
   }
 });

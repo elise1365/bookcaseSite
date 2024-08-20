@@ -4,13 +4,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase
 import { collection, query, where, getFirestore, doc, getDocs, getDoc, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-// ToDo: reading goal for the year
-
 let idsAndTitles = new Map();
 
-// let userId = sessionStorage.getItem("userId");
-// setting userId while testing
-let userId = "XwgBQfethaWFOd3rodpvh2tunRk1";
+let userId;
 let username;
 
 function initApp(){
@@ -71,7 +67,8 @@ async function getName(){
     }
     else{
         console.log("user doesnt exist");
-        // ToDo: add error stuff here!
+        // log user out
+        window.location.href = '../signInUp/signUpPage.html';
     }
 }
 
@@ -113,7 +110,6 @@ async function setName(){
             }
         })
     } else {
-        // ToDo: error stuff!
         console.log("doc not found!");
     }
 }
@@ -137,6 +133,8 @@ function changeUsername(){
 
 // creates a map of book ids and titles on a users bookshelf
 async function getBookTitlesMap() {
+    userId = sessionStorage.getItem("userId");
+
     const db = initApp();
     const bookCasesCollection = collection(db, "bookcases");
     const q = query(bookCasesCollection, where("userID", "==", userId));
@@ -153,7 +151,7 @@ async function getBookTitlesMap() {
                     let bookTitle = await getBookTitle(listOfBookIds[i]);
         
                     if(bookTitle == ""){
-                        // ToDo: add error stuff here
+                        // don't display book if title is blank
                     }
                     else{
                         idsAndTitles.set(listOfBookIds[i], bookTitle);
@@ -162,7 +160,8 @@ async function getBookTitlesMap() {
                 }
                 drawBooks(Array.from(idsAndTitles.entries()));
             })();
-        })
+            getName();
+        });
     }
     else{
         console.log("no bookcase exists for user");
@@ -177,7 +176,7 @@ async function getBookTitlesMap() {
         });
 
         if(docRef.empty){
-            console.log("documenet creation unsuccessful, please try again");
+            console.log("document creation unsuccessful, please try again");
         } else{
             console.log("bookcase creation successful");
             getName();
@@ -199,8 +198,6 @@ async function getBookTitle(bookId){
         return bookTitle;
     }
     else{
-        // ToDo: add error stuff here
-        // alert("nuh uh!");
         console.log("book doesn't exist");
         return "";
     }
@@ -219,10 +216,25 @@ async function passToFullInfoPage(bookId){
 
         window.location.href = '../mainPage/fullInfoPage.html';
     } else{
-        // ToDo: error stuff here!
         console.log("Book doesnt exist :/")
+        // show error message and ask user to create book
+        showErrorMessage("Database error: book doesn't exist, please create that book and try again")
     }
 }
+
+function showErrorMessage(errorText){
+    let errorBanner = document.getElementById("errorBanner");
+    let errorMessageText = document.getElementById("errorText");
+    let closeButton = document.getElementById("closeButton");
+  
+    errorMessageText.textContent = errorText;
+    errorBanner.classList.remove("hidden");
+  
+    closeButton.addEventListener('click', () => {
+      errorBanner.classList.add('hidden');
+      errorMessageText.textContent = "";
+    });
+};
 
 function drawBooks(listOfBooks) {
     sessionStorage.getItem("userId");
@@ -281,15 +293,13 @@ function logout(){
     signOut(auth).then(() => {
         console.log("sign out successful!");
     }).catch((error) => {
-        // ToDo: error stuff!
-        console.log("error logging out: ");
-        console.log(error);
+        console.log("error logging out: ", error);
+        showErrorMessage("Error logging out, please try again");
     })
 }
 
 window.onload = getBookTitlesMap();
-window.onload = getName();
-// window.onload = drawBooks(["The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd", "The Crow Road", "as i walked out one midsummer morning", "klara and the sun", "dfdfd", "cdsfdssd"]);
+// window.onload = getName();
 
 document.addEventListener("DOMContentLoaded", () => {
     const addBookBttn = document.getElementById("addIcon");

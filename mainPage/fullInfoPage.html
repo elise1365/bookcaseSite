@@ -14,9 +14,17 @@
         <p></p>
         <p></p>
         <div id="container">
+            <div id="errorBanner" class="error hidden">
+                <span id="errorText"></span>
+                <button id="closeButton"><i id="closeIcon" class="material-icons" style="font-size:12px;">close</i></button>
+            </div>
             <div class="oneLine">
                 <button><i id="backBttnIcon" class="material-icons">arrow_back</i></button>
-                <p id="title"></p>
+                <div id="titleContainer">
+                    <p id="title"></p>
+                    <p>by</p>
+                    <p id="author"></p>
+                </div>
                 <button><i id="editBttnIcon" class="material-icons">edit</i></editbutton>
             </div>
             <p id="stars"></p>

@@ -1,11 +1,14 @@
 "use strict";
 
+// add author
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getFirestore, doc, setDoc, addDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 let userId = sessionStorage.getItem("userId");
 let stars;
 let title;
+let author;
 let dateStarted;
 let dateFinished;
 let review;
@@ -29,6 +32,7 @@ function initApp(){
 };
 
 function createEditableStars(){
+    stars = 0;
     let starsElement = document.getElementById("stars");
     starsElement.innerHTML = "";
 
@@ -64,66 +68,108 @@ async function addBookToDb(){
     let titleElement = document.getElementById("title");
     title = titleElement.value;
 
-    let reviewElement = document.getElementById("review");
-    review = reviewElement.value;
-
-    let dateStartedElement = document.getElementById("dateStarted");
-    dateStarted = dateStartedElement.value;
-
-    let dateFinishedElement = document.getElementById("dateFinished");
-    dateFinished = dateFinishedElement.value;
-
-    // creating a documenet in the db for the book
-    let db = initApp();
-
-    let docRef = await addDoc(collection(db, "books"), {
-        title: title,
-        review: review,
-        dateStarted: dateStarted,
-        dateFinished: dateFinished,
-        stars: stars,
-        userID: userId
-    })
-
-    // now need to update the users bookcase with this new book, first get list of bookIds, then add new book onto the end
-    // also get username
-    let bookId = docRef.id;
-
-    let listOfBookIds;
-    let docId;
-    let username;
-
-    const bookCasesCollection = collection(db, "bookcases");
-    const q = query(bookCasesCollection, where("userID", "==", userId));
-    const querySnapshot = await getDocs(q);
-
-    // get list from users collection in db
-    if (!querySnapshot.empty){
-        console.log("bookcase exists for user");
-        querySnapshot.forEach((doc) => {
-            const bookcaseData = doc.data();
-            username = bookcaseData.name;
-            listOfBookIds = bookcaseData.listOfBookIds;
-            docId = doc.id;
-        })
+    if(title == ""){
+        showErrorMessage("Please enter a book title and try again");
+    } else {
+        let authorElement = document.getElementById("author");
+        author = authorElement.value;
+        if(author == ""){
+            showErrorMessage("Please enter an author and try again");
+        } else{
+            let reviewElement = document.getElementById("review");
+            review = reviewElement.value;
+        
+            let dateStartedElement = document.getElementById("dateStarted");
+            dateStarted = dateStartedElement.value;
+            if(dateStarted == "") {
+                dateStarted = "0000-00-00";
+            };
+        
+            let dateFinishedElement = document.getElementById("dateFinished");
+            dateFinished = dateFinishedElement.value;
+        
+            // creating a documenet in the db for the book
+            let db = initApp();
+        
+            let docRef = await addDoc(collection(db, "books"), {
+                title: title,
+                author: author,
+                review: review,
+                dateStarted: dateStarted,
+                dateFinished: dateFinished,
+                stars: stars,
+                userID: userId
+            });
+    
+            if(docRef.empty){
+                console.log("document was not created");
+                showErrorMessage("document creation unsuccessful");
+            } else {
+                // now need to update the users bookcase with this new book, first get list of bookIds, then add new book onto the end
+                // also get username
+                let bookId = docRef.id;
+            
+                let listOfBookIds;
+                let docId;
+                let username;
+            
+                const bookCasesCollection = collection(db, "bookcases");
+                const q = query(bookCasesCollection, where("userID", "==", userId));
+                const querySnapshot = await getDocs(q);
+            
+                // get list from users collection in db
+                if (!querySnapshot.empty){
+                    console.log("bookcase exists for user");
+                    querySnapshot.forEach((doc) => {
+                        const bookcaseData = doc.data();
+                        username = bookcaseData.name;
+                        listOfBookIds = bookcaseData.listOfBookIds;
+                        docId = doc.id;
+                    })
+                }
+                else{
+                    console.log("no bookcases available");
+                }
+            
+                listOfBookIds.push(bookId);
+            
+                setDoc(doc(db, "bookcases", docId), {
+                    name: username,
+                    listOfBookIds: listOfBookIds,
+                    userID: userId
+                })
+            
+                window.location.href = '../mainPage/bookcase.html';
+            }
+        }
     }
-    else{
-        console.log("no bookcases available");
-    }
-
-    listOfBookIds.push(bookId);
-
-    setDoc(doc(db, "bookcases", docId), {
-        name: username,
-        listOfBookIds: listOfBookIds,
-        userID: userId
-    })
-
-    window.location.href = '../mainPage/bookcase.html';
 }
+
+function setUpDefaultValues(){
+    // its fine if users leave dateStarted empty but dateFinished must be filed in, hence default value set here
+    let currentDate = new Date();
+    let currentDateFormatted = currentDate.getFullYear() + "-" + String(currentDate.getMonth() + 1).padStart(2, '0') + "-" + String(currentDate.getDate()).padStart(2, '0');
+    let dateFinishedElement = document.getElementById("dateFinished");
+    dateFinishedElement.value = currentDateFormatted;
+}
+
+function showErrorMessage(errorText){
+    let errorBanner = document.getElementById("errorBanner");
+    let errorMessageText = document.getElementById("errorText");
+    let closeButton = document.getElementById("closeButton");
+  
+    errorMessageText.textContent = errorText;
+    errorBanner.classList.remove("hidden");
+  
+    closeButton.addEventListener('click', () => {
+      errorBanner.classList.add('hidden');
+      errorMessageText.textContent = "";
+    });
+};
 
 window.onload = function() {
     createEditableStars();
+    setUpDefaultValues();
 };
 
 document.addEventListener("DOMContentLoaded", () => {
